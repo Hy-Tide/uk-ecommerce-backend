@@ -60,7 +60,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Import routes
 const websiteAuthRoutes = require('./routes/website/auth.routes');
+const websiteUserRoutes = require('./routes/website/user.routes');
+const websiteCategoryRoutes = require('./routes/website/category.routes');
+const websiteBrandRoutes = require('./routes/website/brand.routes');
 const adminAuthRoutes = require('./routes/admin/auth.routes');
+const adminCategoryRoutes = require('./routes/admin/category.routes');
+const adminBrandRoutes = require('./routes/admin/brand.routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
@@ -71,7 +76,13 @@ const API_PREFIX = '/api/v1';
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(`${API_PREFIX}/website/auth`, websiteAuthRoutes);
+app.use(`${API_PREFIX}/website/users`, websiteUserRoutes);
+app.use(`${API_PREFIX}/website/categories`, websiteCategoryRoutes);
+app.use(`${API_PREFIX}/website/brands`, websiteBrandRoutes);
+
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
+app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
+app.use(`${API_PREFIX}/admin/brands`, adminBrandRoutes);
 
 // Root Route for Render Health Checks
 app.get('/', (req, res) => {
