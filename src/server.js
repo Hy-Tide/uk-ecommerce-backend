@@ -17,6 +17,8 @@ const startServer = async () => {
         const server = app.listen(PORT, () => {
             logger.info(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
             logger.info(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+            console.log("MONGODB_URI exists:", !!process.env.MONGODB_URI);
+            console.log("MONGODB_URI:", process.env.MONGODB_URI?.slice(0, 30));
         });
 
         // Handling Unhandled Rejections
