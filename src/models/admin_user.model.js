@@ -45,11 +45,10 @@ const adminUserSchema = new mongoose.Schema(
 );
 
 // Pre-save hook to hash password
-adminUserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+adminUserSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 // Instance method to check password

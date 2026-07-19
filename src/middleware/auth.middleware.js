@@ -34,6 +34,11 @@ exports.protectWebsite = async (req, res, next) => {
 };
 
 exports.protectAdmin = async (req, res, next) => {
+    const unauthorizedResponse = {
+        success: false,
+        message: 'Unauthorized. Please login to continue.'
+    };
+
     try {
         let token;
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -41,23 +46,25 @@ exports.protectAdmin = async (req, res, next) => {
         }
 
         if (!token) {
-            return next(new ApiError(401, 'You are not logged in! Please log in to get access.'));
+            return res.status(401).json(unauthorizedResponse);
         }
 
         const decoded = jwt.verify(token, jwtConfig.secret);
         
         if (decoded.type !== 'admin') {
-            return next(new ApiError(403, 'Access denied. You are not an admin.'));
+            return res.status(401).json(unauthorizedResponse);
         }
 
         const currentAdmin = await AdminUser.findById(decoded.id);
         if (!currentAdmin || currentAdmin.status !== 'active') {
-            return next(new ApiError(401, 'The admin user belonging to this token does no longer exist or is inactive.'));
+            return res.status(401).json(unauthorizedResponse);
         }
 
-        req.user = currentAdmin; // Important to know it's an admin user
+        // Store user in request (backend equivalent of passing session data to next controller)
+        req.user = currentAdmin;
         next();
     } catch (error) {
-        return next(new ApiError(401, 'Invalid or expired token'));
+        // Catch invalid or expired token errors from jwt.verify
+        return res.status(401).json(unauthorizedResponse);
     }
 };

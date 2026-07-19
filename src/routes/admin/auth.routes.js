@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../../controllers/admin/auth.controller');
-// const { protectAdmin } = require('../../middleware/auth.middleware');
+const { protectAdmin } = require('../../middleware/auth.middleware');
 
 /**
  * @swagger
@@ -67,7 +67,6 @@ router.post('/login', authController.login);
  *       400:
  *         description: Email already in use
  */
-// router.post('/create', protectAdmin, authController.create); // Protect once middleware is ready
-router.post('/create', authController.create);
+router.post('/create', protectAdmin, authController.create);
 
 module.exports = router;

@@ -48,12 +48,11 @@ const userSchema = new mongoose.Schema(
 );
 
 // Pre-save hook to hash password
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     
     // Hash the password with cost of 12
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 // Instance method to check password
