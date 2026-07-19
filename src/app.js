@@ -73,6 +73,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(`${API_PREFIX}/website/auth`, websiteAuthRoutes);
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 
+// Root Route for Render Health Checks
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "UK Ecommerce Backend API is running successfully."
+    });
+});
+
 // Health Check Route
 app.get('/health', (req, res) => {
     res.status(200).json(new ApiResponse(200, null, 'API is running successfully'));
