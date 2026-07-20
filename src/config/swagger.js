@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://uk-ecommerce-backend.onrender.com//api/v1',
+        url: 'https://uk-ecommerce-backend.onrender.com/api/v1',
         description: 'Development server',
       },
     ],
