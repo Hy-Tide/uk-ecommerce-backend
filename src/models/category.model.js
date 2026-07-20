@@ -9,11 +9,10 @@ const categorySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save to auto-generate slug if needed
-categorySchema.pre('save', function (next) {
+categorySchema.pre('save', function () {
     if (this.isModified('name')) {
         this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-    next();
 });
 
 module.exports = mongoose.model('Category', categorySchema);

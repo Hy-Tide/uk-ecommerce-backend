@@ -9,11 +9,10 @@ const brandSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save to auto-generate slug if needed
-brandSchema.pre('save', function (next) {
+brandSchema.pre('save', function () {
     if (this.isModified('name')) {
         this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-    next();
 });
 
 module.exports = mongoose.model('Brand', brandSchema);

@@ -3,6 +3,14 @@ const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 
+const mapBrand = (brand) => ({
+    _id: brand._id,
+    name: brand.name,
+    slug: brand.slug,
+    image_url: brand.image_url,
+    description: brand.description
+});
+
 exports.createBrand = async (req, res, next) => {
     try {
         const errors = validationResult(req);
@@ -16,7 +24,7 @@ exports.createBrand = async (req, res, next) => {
         }
 
         const brand = await Brand.create(req.body);
-        res.status(201).json(new ApiResponse(201, { brand }, 'Brand created successfully'));
+        res.status(201).json(new ApiResponse(201, { brand: mapBrand(brand) }, 'Brand created successfully'));
     } catch (error) {
         next(error);
     }
@@ -41,7 +49,7 @@ exports.getAllBrands = async (req, res, next) => {
         const total = await Brand.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
-            brands,
+            brands: brands.map(mapBrand),
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Brands retrieved successfully'));
     } catch (error) {
@@ -55,7 +63,7 @@ exports.getBrandById = async (req, res, next) => {
         if (!brand) {
             return next(new ApiError(404, 'Brand not found'));
         }
-        res.status(200).json(new ApiResponse(200, { brand }, 'Brand retrieved successfully'));
+        res.status(200).json(new ApiResponse(200, { brand: mapBrand(brand) }, 'Brand retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -83,7 +91,7 @@ exports.updateBrand = async (req, res, next) => {
         Object.assign(brand, req.body);
         await brand.save();
 
-        res.status(200).json(new ApiResponse(200, { brand }, 'Brand updated successfully'));
+        res.status(200).json(new ApiResponse(200, { brand: mapBrand(brand) }, 'Brand updated successfully'));
     } catch (error) {
         next(error);
     }

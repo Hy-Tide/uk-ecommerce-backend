@@ -63,9 +63,14 @@ const websiteAuthRoutes = require('./routes/website/auth.routes');
 const websiteUserRoutes = require('./routes/website/user.routes');
 const websiteCategoryRoutes = require('./routes/website/category.routes');
 const websiteBrandRoutes = require('./routes/website/brand.routes');
+const websiteSubCategoryRoutes = require('./routes/website/sub_category.routes');
+const websiteProductRoutes = require('./routes/website/product.routes');
+
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
 const adminBrandRoutes = require('./routes/admin/brand.routes');
+const adminSubCategoryRoutes = require('./routes/admin/sub_category.routes');
+const adminProductRoutes = require('./routes/admin/product.routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
@@ -79,10 +84,14 @@ app.use(`${API_PREFIX}/website/auth`, websiteAuthRoutes);
 app.use(`${API_PREFIX}/website/users`, websiteUserRoutes);
 app.use(`${API_PREFIX}/website/categories`, websiteCategoryRoutes);
 app.use(`${API_PREFIX}/website/brands`, websiteBrandRoutes);
+app.use(`${API_PREFIX}/website/subcategories`, websiteSubCategoryRoutes);
+app.use(`${API_PREFIX}/website/products`, websiteProductRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
 app.use(`${API_PREFIX}/admin/brands`, adminBrandRoutes);
+app.use(`${API_PREFIX}/admin/subcategories`, adminSubCategoryRoutes);
+app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
 
 // Root Route for Render Health Checks
 app.get('/', (req, res) => {

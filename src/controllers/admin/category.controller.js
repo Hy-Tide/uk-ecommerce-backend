@@ -3,6 +3,15 @@ const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 
+const mapCategory = (cat) => ({
+    _id: cat._id,
+    name: cat.name,
+    slug: cat.slug,
+    image_url: cat.image_url,
+    description: cat.description,
+    status: cat.is_active ? 'active' : 'inactive'
+});
+
 exports.createCategory = async (req, res, next) => {
     try {
         const errors = validationResult(req);
@@ -16,7 +25,7 @@ exports.createCategory = async (req, res, next) => {
         }
 
         const category = await Category.create(req.body);
-        res.status(201).json(new ApiResponse(201, { category }, 'Category created successfully'));
+        res.status(201).json(new ApiResponse(201, { category: mapCategory(category) }, 'Category created successfully'));
     } catch (error) {
         next(error);
     }
@@ -42,7 +51,7 @@ exports.getAllCategories = async (req, res, next) => {
         const total = await Category.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
-            categories,
+            categories: categories.map(mapCategory),
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Categories retrieved successfully'));
     } catch (error) {
@@ -56,7 +65,7 @@ exports.getCategoryById = async (req, res, next) => {
         if (!category) {
             return next(new ApiError(404, 'Category not found'));
         }
-        res.status(200).json(new ApiResponse(200, { category }, 'Category retrieved successfully'));
+        res.status(200).json(new ApiResponse(200, { category: mapCategory(category) }, 'Category retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -85,7 +94,7 @@ exports.updateCategory = async (req, res, next) => {
         Object.assign(category, req.body);
         await category.save();
 
-        res.status(200).json(new ApiResponse(200, { category }, 'Category updated successfully'));
+        res.status(200).json(new ApiResponse(200, { category: mapCategory(category) }, 'Category updated successfully'));
     } catch (error) {
         next(error);
     }
