@@ -1,62 +1,103 @@
 const Product = require('../../models/product.model');
-const Category = require('../../models/category.model');
-const Brand = require('../../models/brand.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 
-// Full product map including variants
-const mapProductDetail = (prod) => ({
-    _id: prod._id,
-    category_id: prod.category_id,
-    sub_category_id: prod.sub_category_id,
-    brand_id: prod.brand_id,
-    title: prod.title,
+// Helper to calculate badge based on price and dates (example logic)
+const calculateBadge = (price, salePrice, createdAt) => {
+    if (salePrice > 0 && salePrice < price) {
+        const discount = Math.round(((price - salePrice) / price) * 100);
+        return { text: `-${discount}%`, type: 'discount' };
+    }
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    if (new Date(createdAt) > oneWeekAgo) {
+        return { text: 'New', type: 'new' };
+    }
+    return null;
+};
+
+// Map for Website Product Listing
+const mapProductList = (prod) => ({
+    id: prod._id, // Frontend often uses `id` instead of `_id`
+    name: prod.name,
     slug: prod.slug,
-    description: prod.description,
-    base_price: prod.base_price,
-    discount_price: prod.discount_price,
-    weight: prod.weight,
-    unit: prod.unit,
-    images: prod.images,
-    is_featured: prod.is_featured,
-    status: prod.status,
-    variants: (prod.variants || []).map(v => ({
-        _id: v._id,
-        sku: v.sku,
-        attributes: v.attributes,
-        price_modifier: v.price_modifier,
-        stock_quantity: v.stock_quantity
-    })),
-    created_at: prod.createdAt,
-    updated_at: prod.updatedAt
+    brand: prod.brand, // Ideally populated
+    weight: `${prod.weight}${prod.weightUnit}`,
+    category: prod.categoryId, // Ideally populated
+    subCategory: prod.subCategoryId, // Ideally populated
+    mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
+    price: prod.salePrice > 0 ? prod.salePrice : prod.price,
+    oldPrice: prod.salePrice > 0 ? prod.price : null,
+    badge: calculateBadge(prod.price, prod.salePrice, prod.createdAt)
 });
 
-// Lightweight mapping for lists
-const mapProductList = (prod) => ({
-    _id: prod._id,
-    category_id: prod.category_id,
-    brand_id: prod.brand_id,
-    title: prod.title,
-    slug: prod.slug,
-    base_price: prod.base_price,
-    discount_price: prod.discount_price,
-    images: prod.images && prod.images.length > 0 ? [prod.images[0]] : [],
-    is_featured: prod.is_featured,
-    status: prod.status
-});
+// Map for Website Product Details
+const mapProductDetail = (prod) => {
+    const listFields = mapProductList(prod);
+    
+    return {
+        ...listFields,
+        description: prod.description,
+        highlights: prod.shortDescription ? [prod.shortDescription] : [],
+        features: prod.tags || [],
+        stockCount: prod.stockQuantity,
+        // Mocked calculations (to be implemented with reviews module)
+        rating: 5.0, 
+        reviewCount: 0, 
+        soldCount: "0+ sold recently"
+    };
+};
 
 exports.getProducts = async (req, res, next) => {
     try {
-        const { category_id, sub_category_id, brand_id, sort = '-createdAt', page = 1, limit = 12 } = req.query;
+        const { 
+            category, subCategory, brand, 
+            search, tags, isFeatured, 
+            minPrice, maxPrice, sort,
+            page = 1, limit = 12 
+        } = req.query;
+        
         let query = { status: 'active' };
 
-        if (category_id) query.category_id = category_id;
-        if (sub_category_id) query.sub_category_id = sub_category_id;
-        if (brand_id) query.brand_id = brand_id;
+        // We also support the old `category_id` query param if frontend still sends it
+        const qCategory = category || req.query.category_id || req.query.categoryId;
+        const qSubCategory = subCategory || req.query.sub_category_id || req.query.subCategoryId;
+        const qBrand = brand || req.query.brand_id;
+
+        if (qCategory) query.categoryId = qCategory;
+        if (qSubCategory) query.subCategoryId = qSubCategory;
+        if (qBrand) query.brand = qBrand;
+        if (search) query.name = { $regex: search, $options: 'i' };
+        if (tags) query.tags = { $in: tags.split(',') };
+        if (isFeatured !== undefined) query.isFeatured = isFeatured === 'true';
+
+        // Price filtering
+        if (minPrice || maxPrice) {
+            // It could be base price or sale price, simple filter on base price for now
+            query.price = {};
+            if (minPrice) query.price.$gte = Number(minPrice);
+            if (maxPrice) query.price.$lte = Number(maxPrice);
+        }
+
+        // Sorting
+        let sortOption = {};
+        if (sort === 'name') sortOption.name = 1;
+        else if (sort === '-name') sortOption.name = -1;
+        else if (sort === 'price') sortOption.price = 1;
+        else if (sort === '-price') sortOption.price = -1;
+        else if (sort === 'displayOrder') sortOption.displayOrder = 1;
+        else sortOption.createdAt = -1; // newest by default
 
         const skip = (page - 1) * limit;
 
-        const products = await Product.find(query).skip(skip).limit(parseInt(limit)).sort(sort);
+        const products = await Product.find(query)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort(sortOption)
+            .populate('categoryId', 'name slug')
+            .populate('subCategoryId', 'name slug')
+            .populate('brand', 'name slug');
+            
         const total = await Product.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
@@ -70,7 +111,11 @@ exports.getProducts = async (req, res, next) => {
 
 exports.getProductBySlug = async (req, res, next) => {
     try {
-        const product = await Product.findOne({ slug: req.params.slug, status: 'active' });
+        const product = await Product.findOne({ slug: req.params.slug, status: 'active' })
+            .populate('categoryId', 'name slug')
+            .populate('subCategoryId', 'name slug')
+            .populate('brand', 'name slug');
+            
         if (!product) {
             return next(new ApiError(404, 'Product not found or inactive'));
         }
@@ -79,3 +124,4 @@ exports.getProductBySlug = async (req, res, next) => {
         next(error);
     }
 };
+

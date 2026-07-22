@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const subCategoryController = require('../../controllers/admin/sub_category.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const { subCategoryValidator } = require('../../validators/sub_category.validator');
 
 router.use(authMiddleware.protectAdmin);
 
@@ -34,11 +35,15 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               category_id:
  *                 type: string
- *               image_url:
+ *               description:
  *                 type: string
+ *               image:
+ *                 type: string
+ *               displayOrder:
+ *                 type: integer
  *               status:
  *                 type: string
- *                 enum: [active, inactive]
+ *                 enum: [Active, Inactive]
  *     responses:
  *       201:
  *         description: SubCategory created successfully
@@ -64,12 +69,17 @@ router.use(authMiddleware.protectAdmin);
  *         name: category_id
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [Active, Inactive]
  *     responses:
  *       200:
  *         description: SubCategories retrieved successfully
  */
 router.route('/')
-    .post(subCategoryController.createSubCategory)
+    .post(subCategoryValidator, subCategoryController.createSubCategory)
     .get(subCategoryController.getAllSubCategories);
 
 /**
@@ -109,11 +119,17 @@ router.route('/')
  *             properties:
  *               name:
  *                 type: string
- *               image_url:
+ *               category_id:
  *                 type: string
+ *               description:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *               displayOrder:
+ *                 type: integer
  *               status:
  *                 type: string
- *                 enum: [active, inactive]
+ *                 enum: [Active, Inactive]
  *     responses:
  *       200:
  *         description: SubCategory updated successfully
@@ -134,7 +150,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(subCategoryController.getSubCategoryById)
-    .put(subCategoryController.updateSubCategory)
+    .put(subCategoryValidator, subCategoryController.updateSubCategory)
     .delete(subCategoryController.deleteSubCategory);
 
 module.exports = router;

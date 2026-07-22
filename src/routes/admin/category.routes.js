@@ -35,10 +35,19 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               description:
  *                 type: string
- *               image_url:
+ *               image:
  *                 type: string
- *               is_active:
- *                 type: boolean
+ *               icon:
+ *                 type: string
+ *               displayOrder:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [Active, Inactive]
+ *               seoTitle:
+ *                 type: string
+ *               seoDescription:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Category created successfully
@@ -68,7 +77,7 @@ router.use(authMiddleware.protectAdmin);
  *         name: status
  *         schema:
  *           type: string
- *           enum: [active, inactive]
+ *           enum: [Active, Inactive]
  *     responses:
  *       200:
  *         description: Categories retrieved successfully
@@ -118,10 +127,19 @@ router.route('/')
  *                 type: string
  *               description:
  *                 type: string
- *               image_url:
+ *               image:
  *                 type: string
- *               is_active:
- *                 type: boolean
+ *               icon:
+ *                 type: string
+ *               displayOrder:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [Active, Inactive]
+ *               seoTitle:
+ *                 type: string
+ *               seoDescription:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Category updated successfully

@@ -27,50 +27,54 @@ router.use(authMiddleware.protectAdmin);
  *           schema:
  *             type: object
  *             required:
- *               - title
- *               - base_price
- *               - category_id
+ *               - name
+ *               - categoryId
+ *               - sku
+ *               - weight
+ *               - price
  *             properties:
- *               title:
+ *               name:
  *                 type: string
- *               category_id:
+ *               categoryId:
  *                 type: string
- *               sub_category_id:
+ *               subCategoryId:
  *                 type: string
- *               brand_id:
+ *               brand:
+ *                 type: string
+ *               sku:
+ *                 type: string
+ *               shortDescription:
  *                 type: string
  *               description:
  *                 type: string
- *               base_price:
+ *               price:
  *                 type: number
- *               discount_price:
+ *               salePrice:
  *                 type: number
  *               weight:
  *                 type: string
- *               unit:
+ *               weightUnit:
  *                 type: string
+ *                 enum: [g, kg, ml, L, pcs]
  *               images:
  *                 type: array
  *                 items:
  *                   type: string
- *               is_featured:
- *                 type: boolean
- *               status:
- *                 type: string
- *                 enum: [draft, active, archived]
- *               variants:
+ *               tags:
  *                 type: array
  *                 items:
- *                   type: object
- *                   properties:
- *                     sku:
- *                       type: string
- *                     attributes:
- *                       type: object
- *                     price_modifier:
- *                       type: number
- *                     stock_quantity:
- *                       type: integer
+ *                   type: string
+ *               stockQuantity:
+ *                 type: integer
+ *               inStock:
+ *                 type: boolean
+ *               isFeatured:
+ *                 type: boolean
+ *               displayOrder:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [draft, active, inactive]
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -97,13 +101,38 @@ router.use(authMiddleware.protectAdmin);
  *         schema:
  *           type: string
  *       - in: query
- *         name: category_id
+ *         name: categoryId
  *         schema:
  *           type: string
  *       - in: query
- *         name: brand_id
+ *         name: subCategoryId
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isFeatured
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [name, -name, price, -price, displayOrder, newest]
  *     responses:
  *       200:
  *         description: Products retrieved successfully
@@ -147,14 +176,48 @@ router.route('/')
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *               name:
+ *                 type: string
+ *               categoryId:
+ *                 type: string
+ *               subCategoryId:
+ *                 type: string
+ *               brand:
+ *                 type: string
+ *               sku:
+ *                 type: string
+ *               shortDescription:
  *                 type: string
  *               description:
  *                 type: string
- *               base_price:
+ *               price:
  *                 type: number
+ *               salePrice:
+ *                 type: number
+ *               weight:
+ *                 type: string
+ *               weightUnit:
+ *                 type: string
+ *                 enum: [g, kg, ml, L, pcs]
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               stockQuantity:
+ *                 type: integer
+ *               inStock:
+ *                 type: boolean
+ *               isFeatured:
+ *                 type: boolean
+ *               displayOrder:
+ *                 type: integer
  *               status:
  *                 type: string
+ *                 enum: [draft, active, inactive]
  *     responses:
  *       200:
  *         description: Product updated successfully
@@ -179,3 +242,4 @@ router.route('/:id')
     .delete(productController.deleteProduct);
 
 module.exports = router;
+

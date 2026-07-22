@@ -17,17 +17,37 @@ const productController = require('../../controllers/website/product.controller'
  *     tags: [Website Products]
  *     parameters:
  *       - in: query
- *         name: category_id
+ *         name: search
  *         schema:
  *           type: string
  *       - in: query
- *         name: sub_category_id
+ *         name: category
  *         schema:
  *           type: string
  *       - in: query
- *         name: brand_id
+ *         name: subCategory
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isFeatured
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
  *       - in: query
  *         name: page
  *         schema:
@@ -40,6 +60,7 @@ const productController = require('../../controllers/website/product.controller'
  *         name: sort
  *         schema:
  *           type: string
+ *           enum: [name, -name, price, -price, displayOrder, newest]
  *     responses:
  *       200:
  *         description: Products retrieved successfully

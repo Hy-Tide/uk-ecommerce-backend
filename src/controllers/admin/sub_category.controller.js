@@ -8,9 +8,23 @@ const mapSubCategory = (sub) => ({
     category_id: sub.category_id,
     name: sub.name,
     slug: sub.slug,
-    image_url: sub.image_url,
-    status: sub.status
+    image: sub.image || sub.image_url,
+    description: sub.description,
+    displayOrder: sub.displayOrder,
+    status: sub.status,
+    createdAt: sub.createdAt,
+    updatedAt: sub.updatedAt
 });
+
+const handleBackwardCompatibility = (body) => {
+    const data = { ...body };
+    if (data.image_url && !data.image) data.image = data.image_url;
+    if (data.status) {
+        if (data.status.toLowerCase() === 'active') data.status = 'Active';
+        if (data.status.toLowerCase() === 'inactive') data.status = 'Inactive';
+    }
+    return data;
+};
 
 exports.createSubCategory = async (req, res, next) => {
     try {
@@ -24,7 +38,8 @@ exports.createSubCategory = async (req, res, next) => {
             return next(new ApiError(409, 'Subcategory with this name already exists in this category'));
         }
 
-        const subCategory = await SubCategory.create(req.body);
+        const data = handleBackwardCompatibility(req.body);
+        const subCategory = await SubCategory.create(data);
         res.status(201).json(new ApiResponse(201, { subCategory: mapSubCategory(subCategory) }, 'Subcategory created successfully'));
     } catch (error) {
         next(error);
@@ -42,7 +57,7 @@ exports.getAllSubCategories = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
 
-        const subCategories = await SubCategory.find(query).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+        const subCategories = await SubCategory.find(query).skip(skip).limit(parseInt(limit)).sort({ displayOrder: 1, createdAt: -1 });
         const total = await SubCategory.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
@@ -78,7 +93,8 @@ exports.updateSubCategory = async (req, res, next) => {
             return next(new ApiError(404, 'Subcategory not found'));
         }
 
-        Object.assign(subCategory, req.body);
+        const data = handleBackwardCompatibility(req.body);
+        Object.assign(subCategory, data);
         await subCategory.save();
 
         res.status(200).json(new ApiResponse(200, { subCategory: mapSubCategory(subCategory) }, 'Subcategory updated successfully'));

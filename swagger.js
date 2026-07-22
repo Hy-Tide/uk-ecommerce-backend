@@ -10,7 +10,7 @@ const options = {
         },
         servers: [
             {
-                url: "https://uk-ecommerce-backend.onrender.com",
+                url: "http://localhost:5000",
             },
         ],
     },

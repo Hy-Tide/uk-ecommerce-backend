@@ -75,13 +75,17 @@ const adminBrandRoutes = require('./routes/admin/brand.routes');
 const adminSubCategoryRoutes = require('./routes/admin/sub_category.routes');
 const adminProductRoutes = require('./routes/admin/product.routes');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
+const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
 // API Versioning and Routes
 const API_PREFIX = '/api/v1';
 
 // Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api-docs', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/api-docs-index.html'));
+});
+app.use('/api-docs/website', swaggerUi.serveFiles(websiteSwaggerSpec), swaggerUi.setup(websiteSwaggerSpec));
+app.use('/api-docs/admin', swaggerUi.serveFiles(adminSwaggerSpec), swaggerUi.setup(adminSwaggerSpec));
 
 app.use(`${API_PREFIX}/website/auth`, websiteAuthRoutes);
 app.use(`${API_PREFIX}/website/users`, websiteUserRoutes);
