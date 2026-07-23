@@ -2,6 +2,8 @@ const Category = require('../../models/category.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 const mapCategory = (cat) => ({
     _id: cat._id,
@@ -36,6 +38,11 @@ exports.createCategory = async (req, res, next) => {
         }
 
         const data = handleBackwardCompatibility(req.body);
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            data.image = `${baseUrl}/uploads/${req.file.filename}`;
+        }
 
         const existingCategory = await Category.findOne({ name: data.name });
         if (existingCategory) {
@@ -127,6 +134,20 @@ exports.updateCategory = async (req, res, next) => {
         const category = await Category.findById(req.params.id);
         if (!category) {
             return next(new ApiError(404, 'Category not found'));
+        }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            data.image = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = category.image || category.image_url;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
         }
 
         Object.assign(category, data);

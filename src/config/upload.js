@@ -16,11 +16,11 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'image/webp'];
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new ApiError(400, 'Invalid file type. Only JPG, PNG, GIF, and PDF are allowed.'));
+        cb(new ApiError(400, 'Invalid file type. Only JPG, PNG, GIF, WEBP, and PDF are allowed.'));
     }
 };
 

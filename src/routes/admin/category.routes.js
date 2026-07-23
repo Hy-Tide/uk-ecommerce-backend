@@ -3,6 +3,7 @@ const router = express.Router();
 const categoryController = require('../../controllers/admin/category.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { categoryValidator } = require('../../validators/category.validator');
+const upload = require('../../config/upload');
 
 // All admin category routes require admin authentication
 router.use(authMiddleware.protectAdmin);
@@ -83,7 +84,7 @@ router.use(authMiddleware.protectAdmin);
  *         description: Categories retrieved successfully
  */
 router.route('/')
-    .post(categoryValidator, categoryController.createCategory)
+    .post(upload.single('image'), categoryValidator, categoryController.createCategory)
     .get(categoryController.getAllCategories);
 
 /**
@@ -164,7 +165,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(categoryController.getCategoryById)
-    .put(categoryValidator, categoryController.updateCategory)
+    .put(upload.single('image'), categoryValidator, categoryController.updateCategory)
     .delete(categoryController.deleteCategory);
 
 module.exports = router;

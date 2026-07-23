@@ -74,7 +74,6 @@ const adminCategoryRoutes = require('./routes/admin/category.routes');
 const adminBrandRoutes = require('./routes/admin/brand.routes');
 const adminSubCategoryRoutes = require('./routes/admin/sub_category.routes');
 const adminProductRoutes = require('./routes/admin/product.routes');
-const adminUploadRoutes = require('./routes/admin/upload.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -100,7 +99,6 @@ app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
 app.use(`${API_PREFIX}/admin/brands`, adminBrandRoutes);
 app.use(`${API_PREFIX}/admin/subcategories`, adminSubCategoryRoutes);
 app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
-app.use(`${API_PREFIX}/admin/upload`, adminUploadRoutes);
 
 // Root Route for Render Health Checks
 app.get('/', (req, res) => {
