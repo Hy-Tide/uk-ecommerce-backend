@@ -9,8 +9,8 @@ const baseDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:5000/api/v1',
-      description: 'Development server',
+      url: process.env.NODE_ENV === 'production' ? `${process.env.API_URL_PROD}/api/v1` : `${process.env.API_URL_DEV || 'http://localhost:5000'}/api/v1`,
+      description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
     },
   ],
   components: {

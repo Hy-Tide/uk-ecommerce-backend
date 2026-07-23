@@ -94,7 +94,7 @@ exports.getProducts = async (req, res, next) => {
             .skip(skip)
             .limit(parseInt(limit))
             .sort(sortOption)
-            .populate('categoryId', 'name slug')
+            .populate('categoryId', 'name slug image icon')
             .populate('subCategoryId', 'name slug')
             .populate('brand', 'name slug');
             
@@ -112,7 +112,7 @@ exports.getProducts = async (req, res, next) => {
 exports.getProductBySlug = async (req, res, next) => {
     try {
         const product = await Product.findOne({ slug: req.params.slug, status: 'active' })
-            .populate('categoryId', 'name slug')
+            .populate('categoryId', 'name slug image icon')
             .populate('subCategoryId', 'name slug')
             .populate('brand', 'name slug');
             
