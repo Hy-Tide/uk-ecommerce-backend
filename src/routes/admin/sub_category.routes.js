@@ -4,7 +4,7 @@ const subCategoryController = require('../../controllers/admin/sub_category.cont
 const authMiddleware = require('../../middleware/auth.middleware');
 const { subCategoryValidator } = require('../../validators/sub_category.validator');
 
-router.use(authMiddleware.protectAdmin);
+
 
 /**
  * @swagger
@@ -50,8 +50,6 @@ router.use(authMiddleware.protectAdmin);
  *   get:
  *     summary: Get all subcategories
  *     tags: [Admin SubCategories]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -79,7 +77,7 @@ router.use(authMiddleware.protectAdmin);
  *         description: SubCategories retrieved successfully
  */
 router.route('/')
-    .post(subCategoryValidator, subCategoryController.createSubCategory)
+    .post(authMiddleware.protectAdmin, subCategoryValidator, subCategoryController.createSubCategory)
     .get(subCategoryController.getAllSubCategories);
 
 /**
@@ -88,8 +86,6 @@ router.route('/')
  *   get:
  *     summary: Get a single subcategory by ID
  *     tags: [Admin SubCategories]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -150,7 +146,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(subCategoryController.getSubCategoryById)
-    .put(subCategoryValidator, subCategoryController.updateSubCategory)
-    .delete(subCategoryController.deleteSubCategory);
+    .put(authMiddleware.protectAdmin, subCategoryValidator, subCategoryController.updateSubCategory)
+    .delete(authMiddleware.protectAdmin, subCategoryController.deleteSubCategory);
 
 module.exports = router;

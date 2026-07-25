@@ -19,12 +19,16 @@ const mapProductDetail = (prod) => ({
     shortDescription: prod.shortDescription,
     description: prod.description,
     images: prod.images,
-    weight: prod.weight,
-    weightUnit: prod.weightUnit,
+    variations: prod.variations ? prod.variations.map(v => ({
+        weight: v.weight,
+        weightUnit: v.weightUnit,
+        regularPrice: v.regularPrice,
+        salePrice: v.salePrice,
+        stockQuantity: v.stockQuantity,
+        minStockAlert: v.minStockAlert,
+        displayWeight: v.displayWeight
+    })) : [],
     tags: prod.tags,
-    price: prod.price,
-    salePrice: prod.salePrice,
-    stockQuantity: prod.stockQuantity,
     inStock: prod.inStock,
     isFeatured: prod.isFeatured,
     displayOrder: prod.displayOrder,
@@ -37,9 +41,6 @@ const mapProductDetail = (prod) => ({
     sub_category_id: prod.subCategoryId,
     brand_id: prod.brand,
     title: prod.name,
-    base_price: prod.price,
-    discount_price: prod.salePrice,
-    unit: prod.weightUnit,
     is_featured: prod.isFeatured,
     
     variants: (prod.variants || []).map(v => ({
@@ -60,20 +61,15 @@ const mapProductList = (prod) => ({
     brand: prod.brand,
     name: prod.name,
     slug: prod.slug,
-    price: prod.price,
-    salePrice: prod.salePrice,
+    variations: prod.variations,
     images: prod.images && prod.images.length > 0 ? [prod.images[0]] : [],
     isFeatured: prod.isFeatured,
     status: prod.status,
-    stockQuantity: prod.stockQuantity,
     inStock: prod.inStock,
     
-    // Old fields for backward compatibility
     category_id: prod.categoryId,
     brand_id: prod.brand,
     title: prod.name,
-    base_price: prod.price,
-    discount_price: prod.salePrice,
     is_featured: prod.isFeatured
 });
 
@@ -141,17 +137,17 @@ exports.getAllProducts = async (req, res, next) => {
         
         // Price filtering
         if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
+            query['variations.regularPrice'] = {};
+            if (minPrice) query['variations.regularPrice'].$gte = Number(minPrice);
+            if (maxPrice) query['variations.regularPrice'].$lte = Number(maxPrice);
         }
 
         // Sorting
         let sortOption = {};
         if (sort === 'name') sortOption.name = 1;
         else if (sort === '-name') sortOption.name = -1;
-        else if (sort === 'price') sortOption.price = 1;
-        else if (sort === '-price') sortOption.price = -1;
+        else if (sort === 'price') sortOption['variations.regularPrice'] = 1;
+        else if (sort === '-price') sortOption['variations.regularPrice'] = -1;
         else if (sort === 'displayOrder') sortOption.displayOrder = 1;
         else sortOption.createdAt = -1; // newest by default
 

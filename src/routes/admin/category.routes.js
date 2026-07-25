@@ -5,8 +5,6 @@ const authMiddleware = require('../../middleware/auth.middleware');
 const { categoryValidator } = require('../../validators/category.validator');
 const upload = require('../../config/upload');
 
-// All admin category routes require admin authentication
-router.use(authMiddleware.protectAdmin);
 
 /**
  * @swagger
@@ -60,8 +58,7 @@ router.use(authMiddleware.protectAdmin);
  *   get:
  *     summary: Get all categories (with pagination and search)
  *     tags: [Admin Categories]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: query
  *         name: search
@@ -85,7 +82,7 @@ router.use(authMiddleware.protectAdmin);
  *         description: Categories retrieved successfully
  */
 router.route('/')
-    .post(upload.single('image'), categoryValidator, categoryController.createCategory)
+    .post(authMiddleware.protectAdmin, upload.single('image'), categoryValidator, categoryController.createCategory)
     .get(categoryController.getAllCategories);
 
 /**
@@ -94,8 +91,7 @@ router.route('/')
  *   get:
  *     summary: Get a single category by ID
  *     tags: [Admin Categories]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -167,7 +163,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(categoryController.getCategoryById)
-    .put(upload.single('image'), categoryValidator, categoryController.updateCategory)
-    .delete(categoryController.deleteCategory);
+    .put(authMiddleware.protectAdmin, upload.single('image'), categoryValidator, categoryController.updateCategory)
+    .delete(authMiddleware.protectAdmin, categoryController.deleteCategory);
 
 module.exports = router;

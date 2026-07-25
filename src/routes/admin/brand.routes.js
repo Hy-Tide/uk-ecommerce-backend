@@ -4,8 +4,6 @@ const brandController = require('../../controllers/admin/brand.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { brandValidator } = require('../../validators/brand.validator');
 
-// All admin brand routes require admin authentication
-router.use(authMiddleware.protectAdmin);
 
 /**
  * @swagger
@@ -49,8 +47,7 @@ router.use(authMiddleware.protectAdmin);
  *   get:
  *     summary: Get all brands (with pagination and search)
  *     tags: [Admin Brands]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: query
  *         name: search
@@ -74,7 +71,7 @@ router.use(authMiddleware.protectAdmin);
  *         description: Brands retrieved successfully
  */
 router.route('/')
-    .post(brandValidator, brandController.createBrand)
+    .post(authMiddleware.protectAdmin, brandValidator, brandController.createBrand)
     .get(brandController.getAllBrands);
 
 /**
@@ -83,8 +80,7 @@ router.route('/')
  *   get:
  *     summary: Get a single brand by ID
  *     tags: [Admin Brands]
- *     security:
- *       - bearerAuth: []
+
  *     parameters:
  *       - in: path
  *         name: id
@@ -146,7 +142,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(brandController.getBrandById)
-    .put(brandValidator, brandController.updateBrand)
-    .delete(brandController.deleteBrand);
+    .put(authMiddleware.protectAdmin, brandValidator, brandController.updateBrand)
+    .delete(authMiddleware.protectAdmin, brandController.deleteBrand);
 
 module.exports = router;

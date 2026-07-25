@@ -17,30 +17,52 @@ const calculateBadge = (price, salePrice, createdAt) => {
 };
 
 // Map for Website Product Listing
-const mapProductList = (prod) => ({
-    id: prod._id, // Frontend often uses `id` instead of `_id`
-    name: prod.name,
-    slug: prod.slug,
-    brand: prod.brand, // Ideally populated
-    weight: `${prod.weight}${prod.weightUnit}`,
-    category: prod.categoryId, // Ideally populated
-    subCategory: prod.subCategoryId, // Ideally populated
-    mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
-    price: prod.salePrice > 0 ? prod.salePrice : prod.price,
-    oldPrice: prod.salePrice > 0 ? prod.price : null,
-    badge: calculateBadge(prod.price, prod.salePrice, prod.createdAt)
-});
+const mapProductList = (prod) => {
+    let basePrice = 0;
+    let discountPrice = 0;
+    let badge = null;
+
+    if (prod.variations && prod.variations.length > 0) {
+        basePrice = prod.variations[0].regularPrice;
+        discountPrice = prod.variations[0].salePrice;
+        badge = calculateBadge(basePrice, discountPrice, prod.createdAt);
+    } else {
+        badge = calculateBadge(0, 0, prod.createdAt);
+    }
+
+    return {
+        id: prod._id, // Frontend often uses `id` instead of `_id`
+        name: prod.name,
+        slug: prod.slug,
+        brand: prod.brand, // Ideally populated
+        category: prod.categoryId, // Ideally populated
+        subCategory: prod.subCategoryId, // Ideally populated
+        mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
+        variations: prod.variations ? prod.variations.map(v => ({
+            weight: v.weight,
+            weightUnit: v.weightUnit,
+            regularPrice: v.regularPrice,
+            salePrice: v.salePrice,
+            stockQuantity: v.stockQuantity,
+            minStockAlert: v.minStockAlert,
+            displayWeight: v.displayWeight
+        })) : [],
+        badge: badge
+    };
+};
 
 // Map for Website Product Details
 const mapProductDetail = (prod) => {
     const listFields = mapProductList(prod);
     
+    const totalStock = (prod.variations || []).reduce((acc, curr) => acc + (curr.stockQuantity || 0), 0);
+
     return {
         ...listFields,
         description: prod.description,
         highlights: prod.shortDescription ? [prod.shortDescription] : [],
         features: prod.tags || [],
-        stockCount: prod.stockQuantity,
+        stockCount: totalStock,
         // Mocked calculations (to be implemented with reviews module)
         rating: 5.0, 
         reviewCount: 0, 
@@ -73,18 +95,17 @@ exports.getProducts = async (req, res, next) => {
 
         // Price filtering
         if (minPrice || maxPrice) {
-            // It could be base price or sale price, simple filter on base price for now
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
+            query['variations.regularPrice'] = {};
+            if (minPrice) query['variations.regularPrice'].$gte = Number(minPrice);
+            if (maxPrice) query['variations.regularPrice'].$lte = Number(maxPrice);
         }
 
         // Sorting
         let sortOption = {};
         if (sort === 'name') sortOption.name = 1;
         else if (sort === '-name') sortOption.name = -1;
-        else if (sort === 'price') sortOption.price = 1;
-        else if (sort === '-price') sortOption.price = -1;
+        else if (sort === 'price') sortOption['variations.regularPrice'] = 1;
+        else if (sort === '-price') sortOption['variations.regularPrice'] = -1;
         else if (sort === 'displayOrder') sortOption.displayOrder = 1;
         else sortOption.createdAt = -1; // newest by default
 

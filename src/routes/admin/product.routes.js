@@ -3,7 +3,7 @@ const router = express.Router();
 const productController = require('../../controllers/admin/product.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 
-router.use(authMiddleware.protectAdmin);
+
 
 /**
  * @swagger
@@ -30,8 +30,7 @@ router.use(authMiddleware.protectAdmin);
  *               - name
  *               - categoryId
  *               - sku
- *               - weight
- *               - price
+ *               - variations
  *             properties:
  *               name:
  *                 type: string
@@ -47,15 +46,24 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               description:
  *                 type: string
- *               price:
- *                 type: number
- *               salePrice:
- *                 type: number
- *               weight:
- *                 type: string
- *               weightUnit:
- *                 type: string
- *                 enum: [g, kg, ml, L, pcs]
+ *               variations:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     weight:
+ *                       type: number
+ *                     weightUnit:
+ *                       type: string
+ *                       enum: [g, ml]
+ *                     regularPrice:
+ *                       type: number
+ *                     salePrice:
+ *                       type: number
+ *                     stockQuantity:
+ *                       type: integer
+ *                     minStockAlert:
+ *                       type: integer
  *               images:
  *                 type: array
  *                 items:
@@ -64,8 +72,7 @@ router.use(authMiddleware.protectAdmin);
  *                 type: array
  *                 items:
  *                   type: string
- *               stockQuantity:
- *                 type: integer
+
  *               inStock:
  *                 type: boolean
  *               isFeatured:
@@ -81,8 +88,6 @@ router.use(authMiddleware.protectAdmin);
  *   get:
  *     summary: Get all products
  *     tags: [Admin Products]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -138,7 +143,7 @@ router.use(authMiddleware.protectAdmin);
  *         description: Products retrieved successfully
  */
 router.route('/')
-    .post(productController.createProduct)
+    .post(authMiddleware.protectAdmin, productController.createProduct)
     .get(productController.getAllProducts);
 
 /**
@@ -147,8 +152,6 @@ router.route('/')
  *   get:
  *     summary: Get a single product by ID
  *     tags: [Admin Products]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -190,15 +193,24 @@ router.route('/')
  *                 type: string
  *               description:
  *                 type: string
- *               price:
- *                 type: number
- *               salePrice:
- *                 type: number
- *               weight:
- *                 type: string
- *               weightUnit:
- *                 type: string
- *                 enum: [g, kg, ml, L, pcs]
+ *               variations:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     weight:
+ *                       type: number
+ *                     weightUnit:
+ *                       type: string
+ *                       enum: [g, ml]
+ *                     regularPrice:
+ *                       type: number
+ *                     salePrice:
+ *                       type: number
+ *                     stockQuantity:
+ *                       type: integer
+ *                     minStockAlert:
+ *                       type: integer
  *               images:
  *                 type: array
  *                 items:
@@ -207,8 +219,7 @@ router.route('/')
  *                 type: array
  *                 items:
  *                   type: string
- *               stockQuantity:
- *                 type: integer
+
  *               inStock:
  *                 type: boolean
  *               isFeatured:
@@ -238,8 +249,8 @@ router.route('/')
  */
 router.route('/:id')
     .get(productController.getProductById)
-    .put(productController.updateProduct)
-    .delete(productController.deleteProduct);
+    .put(authMiddleware.protectAdmin, productController.updateProduct)
+    .delete(authMiddleware.protectAdmin, productController.deleteProduct);
 
 module.exports = router;
 
