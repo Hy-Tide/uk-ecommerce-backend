@@ -146,3 +146,81 @@ exports.getProductBySlug = async (req, res, next) => {
     }
 };
 
+exports.getProductsByCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const { 
+            page = 1, limit = 12, sort 
+        } = req.query;
+        
+        let query = { status: 'active', categoryId };
+
+        // Sorting
+        let sortOption = {};
+        if (sort === 'name') sortOption.name = 1;
+        else if (sort === '-name') sortOption.name = -1;
+        else if (sort === 'price') sortOption['variations.regularPrice'] = 1;
+        else if (sort === '-price') sortOption['variations.regularPrice'] = -1;
+        else if (sort === 'displayOrder') sortOption.displayOrder = 1;
+        else sortOption.createdAt = -1; // newest by default
+
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find(query)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort(sortOption)
+            .populate('categoryId', 'name slug image icon')
+            .populate('subCategoryId', 'name slug')
+            .populate('brand', 'name slug');
+            
+        const total = await Product.countDocuments(query);
+
+        res.status(200).json(new ApiResponse(200, {
+            products: products.map(mapProductList),
+            meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
+        }, 'Products by category retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getProductsBySubCategory = async (req, res, next) => {
+    try {
+        const { subCategoryId } = req.params;
+        const { 
+            page = 1, limit = 12, sort 
+        } = req.query;
+        
+        let query = { status: 'active', subCategoryId };
+
+        // Sorting
+        let sortOption = {};
+        if (sort === 'name') sortOption.name = 1;
+        else if (sort === '-name') sortOption.name = -1;
+        else if (sort === 'price') sortOption['variations.regularPrice'] = 1;
+        else if (sort === '-price') sortOption['variations.regularPrice'] = -1;
+        else if (sort === 'displayOrder') sortOption.displayOrder = 1;
+        else sortOption.createdAt = -1; // newest by default
+
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find(query)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .sort(sortOption)
+            .populate('categoryId', 'name slug image icon')
+            .populate('subCategoryId', 'name slug')
+            .populate('brand', 'name slug');
+            
+        const total = await Product.countDocuments(query);
+
+        res.status(200).json(new ApiResponse(200, {
+            products: products.map(mapProductList),
+            meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
+        }, 'Products by sub-category retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+

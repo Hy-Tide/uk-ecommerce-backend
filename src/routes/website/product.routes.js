@@ -87,4 +87,66 @@ router.get('/', productController.getProducts);
  */
 router.get('/:slug', productController.getProductBySlug);
 
+/**
+ * @swagger
+ * /website/products/category/{categoryId}:
+ *   get:
+ *     summary: Get products by category
+ *     tags: [Website Products]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [name, -name, price, -price, displayOrder, newest]
+ *     responses:
+ *       200:
+ *         description: Products retrieved successfully
+ */
+router.get('/category/:categoryId', productController.getProductsByCategory);
+
+/**
+ * @swagger
+ * /website/products/subcategory/{subCategoryId}:
+ *   get:
+ *     summary: Get products by sub-category
+ *     tags: [Website Products]
+ *     parameters:
+ *       - in: path
+ *         name: subCategoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [name, -name, price, -price, displayOrder, newest]
+ *     responses:
+ *       200:
+ *         description: Products retrieved successfully
+ */
+router.get('/subcategory/:subCategoryId', productController.getProductsBySubCategory);
+
 module.exports = router;
