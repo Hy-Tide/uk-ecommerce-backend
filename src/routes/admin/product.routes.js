@@ -46,6 +46,12 @@ const authMiddleware = require('../../middleware/auth.middleware');
  *                 type: string
  *               description:
  *                 type: string
+ *               ingredients:
+ *                 type: string
+ *               nutritionalInformation:
+ *                 type: string
+ *               highlights:
+ *                 type: string
  *               variations:
  *                 type: array
  *                 items:
@@ -192,6 +198,12 @@ router.route('/')
  *               shortDescription:
  *                 type: string
  *               description:
+ *                 type: string
+ *               ingredients:
+ *                 type: string
+ *               nutritionalInformation:
+ *                 type: string
+ *               highlights:
  *                 type: string
  *               variations:
  *                 type: array

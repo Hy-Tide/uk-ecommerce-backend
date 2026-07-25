@@ -34,9 +34,15 @@ const mapProductList = (prod) => {
         id: prod._id, // Frontend often uses `id` instead of `_id`
         name: prod.name,
         slug: prod.slug,
+        description: prod.description,
+        ingredients: prod.ingredients,
+        nutritionalInformation: prod.nutritionalInformation,
+        nutritionalInfo: prod.nutritionalInformation,
+        highlights: prod.highlights,
         brand: prod.brand, // Ideally populated
         category: prod.categoryId, // Ideally populated
         subCategory: prod.subCategoryId, // Ideally populated
+        displayOrder: prod.displayOrder,
         mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
         variations: prod.variations ? prod.variations.map(v => ({
             weight: v.weight,
@@ -60,7 +66,10 @@ const mapProductDetail = (prod) => {
     return {
         ...listFields,
         description: prod.description,
-        highlights: prod.shortDescription ? [prod.shortDescription] : [],
+        ingredients: prod.ingredients,
+        nutritionalInformation: prod.nutritionalInformation,
+        nutritionalInfo: prod.nutritionalInformation,
+        highlights: prod.highlights,
         features: prod.tags || [],
         stockCount: totalStock,
         // Mocked calculations (to be implemented with reviews module)

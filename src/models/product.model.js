@@ -26,6 +26,9 @@ const productSchema = new mongoose.Schema({
     sku: { type: String, unique: true, required: true },
     shortDescription: { type: String },
     description: { type: String },
+    ingredients: { type: String },
+    nutritionalInformation: { type: String },
+    highlights: { type: String },
     images: [{ type: String }],
     variations: {
         type: [variationSchema],
