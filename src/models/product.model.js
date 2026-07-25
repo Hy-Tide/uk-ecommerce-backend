@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const variationSchema = new mongoose.Schema({
     weight: { type: Number, required: true, min: 0 },
-    weightUnit: { type: String, enum: ['g', 'ml'], required: true },
+    weightUnit: { type: String, enum: ['g', 'kg', 'ml', 'l', 'pcs', 'pack'], required: true },
     regularPrice: { type: Number, required: true, min: 0 },
     salePrice: { type: Number, default: 0, min: 0 },
     stockQuantity: { type: Number, default: 0, min: 0 },
@@ -61,6 +61,10 @@ productSchema.pre('validate', function() {
             } else if (v.weightUnit === 'ml' && v.weight >= 1000) {
                 const l = v.weight / 1000;
                 v.displayWeight = `${Number.isInteger(l) ? l : l.toFixed(2)}L`;
+            } else if (v.weightUnit === 'l') {
+                v.displayWeight = `${v.weight}L`;
+            } else if (v.weightUnit === 'pcs' || v.weightUnit === 'pack') {
+                v.displayWeight = `${v.weight} ${v.weightUnit}`;
             } else {
                 v.displayWeight = `${v.weight}${v.weightUnit}`;
             }

@@ -55,7 +55,7 @@ const authMiddleware = require('../../middleware/auth.middleware');
  *                       type: number
  *                     weightUnit:
  *                       type: string
- *                       enum: [g, ml]
+ *                       enum: [g, kg, ml, l, pcs, pack]
  *                     regularPrice:
  *                       type: number
  *                     salePrice:
@@ -202,7 +202,7 @@ router.route('/')
  *                       type: number
  *                     weightUnit:
  *                       type: string
- *                       enum: [g, ml]
+ *                       enum: [g, kg, ml, l, pcs, pack]
  *                     regularPrice:
  *                       type: number
  *                     salePrice:
