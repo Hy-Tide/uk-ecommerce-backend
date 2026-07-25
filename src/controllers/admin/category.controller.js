@@ -56,6 +56,13 @@ exports.createCategory = async (req, res, next) => {
             }
         }
 
+        if (data.displayOrder !== undefined) {
+            await Category.updateMany(
+                { displayOrder: { $gte: data.displayOrder } },
+                { $inc: { displayOrder: 1 } }
+            );
+        }
+
         const category = await Category.create(data);
         res.status(201).json(new ApiResponse(201, { category: mapCategory(category) }, 'Category created successfully'));
     } catch (error) {
@@ -148,6 +155,13 @@ exports.updateCategory = async (req, res, next) => {
                     fs.unlinkSync(oldFilePath);
                 }
             }
+        }
+
+        if (data.displayOrder !== undefined && Number(data.displayOrder) !== category.displayOrder) {
+            await Category.updateMany(
+                { displayOrder: { $gte: Number(data.displayOrder) }, _id: { $ne: category._id } },
+                { $inc: { displayOrder: 1 } }
+            );
         }
 
         Object.assign(category, data);

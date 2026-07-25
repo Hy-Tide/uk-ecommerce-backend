@@ -109,6 +109,13 @@ exports.createProduct = async (req, res, next) => {
             req.body.brand = brandDoc._id;
         }
 
+        if (req.body.displayOrder !== undefined) {
+            await Product.updateMany(
+                { categoryId: req.body.categoryId, displayOrder: { $gte: req.body.displayOrder } },
+                { $inc: { displayOrder: 1 } }
+            );
+        }
+
         const product = await Product.create(req.body);
         res.status(201).json(new ApiResponse(201, { product: mapProductDetail(product) }, 'Product created successfully'));
     } catch (error) {
@@ -203,6 +210,17 @@ exports.updateProduct = async (req, res, next) => {
                  brandDoc = await Brand.create({ name: req.body.brand });
             }
             req.body.brand = brandDoc._id;
+        }
+
+        if (req.body.displayOrder !== undefined && Number(req.body.displayOrder) !== product.displayOrder) {
+            await Product.updateMany(
+                { 
+                    categoryId: req.body.categoryId || product.categoryId, 
+                    displayOrder: { $gte: Number(req.body.displayOrder) },
+                    _id: { $ne: product._id }
+                },
+                { $inc: { displayOrder: 1 } }
+            );
         }
 
         Object.assign(product, req.body);

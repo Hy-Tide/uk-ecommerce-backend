@@ -39,6 +39,13 @@ exports.createSubCategory = async (req, res, next) => {
         }
 
         const data = handleBackwardCompatibility(req.body);
+        if (data.displayOrder !== undefined) {
+            await SubCategory.updateMany(
+                { category_id: data.category_id, displayOrder: { $gte: data.displayOrder } },
+                { $inc: { displayOrder: 1 } }
+            );
+        }
+
         const subCategory = await SubCategory.create(data);
         res.status(201).json(new ApiResponse(201, { subCategory: mapSubCategory(subCategory) }, 'Subcategory created successfully'));
     } catch (error) {
@@ -94,6 +101,17 @@ exports.updateSubCategory = async (req, res, next) => {
         }
 
         const data = handleBackwardCompatibility(req.body);
+        if (data.displayOrder !== undefined && Number(data.displayOrder) !== subCategory.displayOrder) {
+            await SubCategory.updateMany(
+                { 
+                    category_id: data.category_id || subCategory.category_id, 
+                    displayOrder: { $gte: Number(data.displayOrder) }, 
+                    _id: { $ne: subCategory._id } 
+                },
+                { $inc: { displayOrder: 1 } }
+            );
+        }
+
         Object.assign(subCategory, data);
         await subCategory.save();
 
