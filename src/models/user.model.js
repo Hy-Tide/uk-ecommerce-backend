@@ -40,6 +40,15 @@ const userSchema = new mongoose.Schema(
         },
         last_login: {
             type: Date,
+        },
+        status: {
+            type: String,
+            enum: ['Active', 'Inactive'],
+            default: 'Active',
+        },
+        is_blocked: {
+            type: Boolean,
+            default: false,
         }
     },
     {
