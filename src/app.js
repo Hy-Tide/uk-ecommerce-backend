@@ -72,6 +72,7 @@ const websiteWishlistRoutes = require('./routes/website/wishlist.routes');
 const websiteCartRoutes = require('./routes/website/cart.routes');
 const websiteCouponRoutes = require('./routes/website/coupon.routes');
 const websiteCheckoutRoutes = require('./routes/website/checkout.routes');
+const websiteOrderRoutes = require('./routes/website/order.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -80,6 +81,7 @@ const adminSubCategoryRoutes = require('./routes/admin/sub_category.routes');
 const adminProductRoutes = require('./routes/admin/product.routes');
 const adminCustomerRoutes = require('./routes/admin/customer.routes');
 const adminCouponRoutes = require('./routes/admin/coupon.routes');
+const adminOrderRoutes = require('./routes/admin/order.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -103,6 +105,7 @@ app.use(`${API_PREFIX}/website/wishlist`, websiteWishlistRoutes);
 app.use(`${API_PREFIX}/website/cart`, websiteCartRoutes);
 app.use(`${API_PREFIX}/website/coupons`, websiteCouponRoutes);
 app.use(`${API_PREFIX}/website/checkout`, websiteCheckoutRoutes);
+app.use(`${API_PREFIX}/website/orders`, websiteOrderRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -111,8 +114,9 @@ app.use(`${API_PREFIX}/admin/subcategories`, adminSubCategoryRoutes);
 app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
 app.use(`${API_PREFIX}/admin/customers`, adminCustomerRoutes);
 app.use(`${API_PREFIX}/admin/coupons`, adminCouponRoutes);
+app.use(`${API_PREFIX}/admin/orders`, adminOrderRoutes);
 
-// Root Route for Render Health Checks   
+// Root Route for Render Health Checks    
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,

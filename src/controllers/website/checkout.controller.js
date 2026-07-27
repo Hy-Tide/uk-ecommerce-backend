@@ -135,7 +135,7 @@ exports.placeOrder = async (req, res, next) => {
             totalAmount: cart.totalAmount,
             paymentMethod,
             paymentStatus: paymentMethod === 'cod' ? 'pending' : 'completed', // Simplified
-            orderStatus: 'pending'
+            orderStatus: 'Pending'
         });
 
         // Clear cart
