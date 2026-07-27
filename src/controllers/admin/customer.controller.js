@@ -1,4 +1,5 @@
 const User = require('../../models/user.model');
+const Wishlist = require('../../models/wishlist.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
@@ -168,6 +169,21 @@ exports.deleteCustomer = async (req, res, next) => {
             return next(new ApiError(404, 'Customer not found'));
         }
         res.status(200).json(new ApiResponse(200, null, 'Customer deleted successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getCustomerWishlist = async (req, res, next) => {
+    try {
+        const customer = await User.findById(req.params.id);
+        if (!customer) {
+            return next(new ApiError(404, 'Customer not found'));
+        }
+
+        const wishlist = await Wishlist.findOne({ user_id: req.params.id }).populate('products');
+        
+        res.status(200).json(new ApiResponse(200, { wishlist: wishlist || { user_id: req.params.id, products: [] } }, 'Customer wishlist retrieved successfully'));
     } catch (error) {
         next(error);
     }

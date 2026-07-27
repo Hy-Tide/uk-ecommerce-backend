@@ -199,4 +199,27 @@ router.route('/:id/block')
 router.route('/:id/unblock')
     .patch(authMiddleware.protectAdmin, customerController.unblockCustomer);
 
+/**
+ * @swagger
+ * /admin/customers/{id}/wishlist:
+ *   get:
+ *     summary: Get a customer's wishlist
+ *     tags: [Admin Customers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Customer wishlist retrieved successfully
+ *       404:
+ *         description: Customer not found
+ */
+router.route('/:id/wishlist')
+    .get(authMiddleware.protectAdmin, customerController.getCustomerWishlist);
+
 module.exports = router;

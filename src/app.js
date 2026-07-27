@@ -68,6 +68,7 @@ const websiteCategoryRoutes = require('./routes/website/category.routes');
 const websiteBrandRoutes = require('./routes/website/brand.routes');
 const websiteSubCategoryRoutes = require('./routes/website/sub_category.routes');
 const websiteProductRoutes = require('./routes/website/product.routes');
+const websiteWishlistRoutes = require('./routes/website/wishlist.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -94,6 +95,7 @@ app.use(`${API_PREFIX}/website/categories`, websiteCategoryRoutes);
 app.use(`${API_PREFIX}/website/brands`, websiteBrandRoutes);
 app.use(`${API_PREFIX}/website/subcategories`, websiteSubCategoryRoutes);
 app.use(`${API_PREFIX}/website/products`, websiteProductRoutes);
+app.use(`${API_PREFIX}/website/wishlist`, websiteWishlistRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -102,7 +104,7 @@ app.use(`${API_PREFIX}/admin/subcategories`, adminSubCategoryRoutes);
 app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
 app.use(`${API_PREFIX}/admin/customers`, adminCustomerRoutes);
 
-// Root Route for Render Health Checks
+// Root Route for Render Health Checks 
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
