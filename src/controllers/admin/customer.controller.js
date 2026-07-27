@@ -1,5 +1,6 @@
 const User = require('../../models/user.model');
 const Wishlist = require('../../models/wishlist.model');
+const Cart = require('../../models/cart.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
@@ -184,6 +185,26 @@ exports.getCustomerWishlist = async (req, res, next) => {
         const wishlist = await Wishlist.findOne({ user_id: req.params.id }).populate('products');
         
         res.status(200).json(new ApiResponse(200, { wishlist: wishlist || { user_id: req.params.id, products: [] } }, 'Customer wishlist retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getCustomerCart = async (req, res, next) => {
+    try {
+        const customer = await User.findById(req.params.id);
+        if (!customer) {
+            return next(new ApiError(404, 'Customer not found'));
+        }
+
+        const cart = await Cart.findOne({ user: req.params.id })
+            .populate({
+                path: 'items.product',
+                select: 'name slug images inStock'
+            })
+            .populate('coupon', 'code discountType discountValue');
+        
+        res.status(200).json(new ApiResponse(200, { cart: cart || { user: req.params.id, items: [], subTotal: 0, discountAmount: 0, totalAmount: 0 } }, 'Customer cart retrieved successfully'));
     } catch (error) {
         next(error);
     }

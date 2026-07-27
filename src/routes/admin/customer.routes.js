@@ -222,4 +222,27 @@ router.route('/:id/unblock')
 router.route('/:id/wishlist')
     .get(authMiddleware.protectAdmin, customerController.getCustomerWishlist);
 
+/**
+ * @swagger
+ * /admin/customers/{id}/cart:
+ *   get:
+ *     summary: Get a customer's cart
+ *     tags: [Admin Customers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Customer cart retrieved successfully
+ *       404:
+ *         description: Customer not found
+ */
+router.route('/:id/cart')
+    .get(authMiddleware.protectAdmin, customerController.getCustomerCart);
+
 module.exports = router;
