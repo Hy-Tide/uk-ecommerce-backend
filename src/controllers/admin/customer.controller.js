@@ -1,4 +1,5 @@
 const User = require('../../models/user.model');
+const Address = require('../../models/address.model');
 const Wishlist = require('../../models/wishlist.model');
 const Cart = require('../../models/cart.model');
 const ApiError = require('../../utils/ApiError');
@@ -64,7 +65,12 @@ exports.getCustomerById = async (req, res, next) => {
         if (!customer) {
             return next(new ApiError(404, 'Customer not found'));
         }
-        res.status(200).json(new ApiResponse(200, { customer: mapCustomer(customer) }, 'Customer retrieved successfully'));
+        
+        const addresses = await Address.find({ user_id: req.params.id });
+        const customerData = mapCustomer(customer);
+        customerData.addresses = addresses;
+
+        res.status(200).json(new ApiResponse(200, { customer: customerData }, 'Customer retrieved successfully'));
     } catch (error) {
         next(error);
     }
