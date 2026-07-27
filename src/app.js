@@ -71,6 +71,7 @@ const websiteProductRoutes = require('./routes/website/product.routes');
 const websiteWishlistRoutes = require('./routes/website/wishlist.routes');
 const websiteCartRoutes = require('./routes/website/cart.routes');
 const websiteCouponRoutes = require('./routes/website/coupon.routes');
+const websiteCheckoutRoutes = require('./routes/website/checkout.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -101,6 +102,7 @@ app.use(`${API_PREFIX}/website/products`, websiteProductRoutes);
 app.use(`${API_PREFIX}/website/wishlist`, websiteWishlistRoutes);
 app.use(`${API_PREFIX}/website/cart`, websiteCartRoutes);
 app.use(`${API_PREFIX}/website/coupons`, websiteCouponRoutes);
+app.use(`${API_PREFIX}/website/checkout`, websiteCheckoutRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -110,7 +112,7 @@ app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
 app.use(`${API_PREFIX}/admin/customers`, adminCustomerRoutes);
 app.use(`${API_PREFIX}/admin/coupons`, adminCouponRoutes);
 
-// Root Route for Render Health Checks  
+// Root Route for Render Health Checks   
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
