@@ -45,6 +45,7 @@ const mapProductList = (prod) => {
         displayOrder: prod.displayOrder,
         mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
         variations: prod.variations ? prod.variations.map(v => ({
+            _id: v._id,
             weight: v.weight,
             weightUnit: v.weightUnit,
             regularPrice: v.regularPrice,

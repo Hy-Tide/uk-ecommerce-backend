@@ -23,6 +23,7 @@ const mapProductDetail = (prod) => ({
     highlights: prod.highlights,
     images: prod.images,
     variations: prod.variations ? prod.variations.map(v => ({
+        _id: v._id,
         weight: v.weight,
         weightUnit: v.weightUnit,
         regularPrice: v.regularPrice,
