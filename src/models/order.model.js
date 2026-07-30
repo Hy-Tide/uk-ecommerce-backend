@@ -8,12 +8,27 @@ const orderItemSchema = new mongoose.Schema({
     quantity: { type: Number, required: true }
 });
 
+const orderAddressSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    houseNumber: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    county: { type: String },
+    postcode: { type: String, required: true },
+    addressType: { type: String }
+}, { _id: false });
+
 const orderSchema = new mongoose.Schema({
     orderNumber: { type: String, required: true, unique: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     items: [orderItemSchema],
-    shippingAddress: { type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true },
-    billingAddress: { type: mongoose.Schema.Types.ObjectId, ref: 'Address' },
+    shippingAddress: { type: orderAddressSchema, required: true },
+    billingAddress: { type: orderAddressSchema },
+    deliveryNotes: { type: String },
+    deliverySlot: { type: String },
     coupon: { type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' },
     subTotal: { type: Number, required: true },
     discountAmount: { type: Number, default: 0 },

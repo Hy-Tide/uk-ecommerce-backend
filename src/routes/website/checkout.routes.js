@@ -62,8 +62,52 @@ router.get('/payment-methods', checkoutController.getPaymentMethods);
  *               - paymentMethod
  *             properties:
  *               shippingAddress:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   firstName:
+ *                     type: string
+ *                   lastName:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   houseNumber:
+ *                     type: string
+ *                   street:
+ *                     type: string
+ *                   city:
+ *                     type: string
+ *                   county:
+ *                     type: string
+ *                   postcode:
+ *                     type: string
+ *                   addressType:
+ *                     type: string
  *               billingAddress:
+ *                 type: object
+ *                 properties:
+ *                   firstName:
+ *                     type: string
+ *                   lastName:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   houseNumber:
+ *                     type: string
+ *                   street:
+ *                     type: string
+ *                   city:
+ *                     type: string
+ *                   county:
+ *                     type: string
+ *                   postcode:
+ *                     type: string
+ *               deliveryNotes:
+ *                 type: string
+ *               deliverySlot:
  *                 type: string
  *               paymentMethod:
  *                 type: string

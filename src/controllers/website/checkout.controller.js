@@ -76,7 +76,7 @@ exports.getPaymentMethods = async (req, res, next) => {
 
 exports.placeOrder = async (req, res, next) => {
     try {
-        const { shippingAddress, billingAddress, paymentMethod } = req.body;
+        const { shippingAddress, billingAddress, paymentMethod, deliveryNotes, deliverySlot } = req.body;
 
         if (!shippingAddress) return next(new ApiError(400, 'Shipping address is required'));
         if (!paymentMethod) return next(new ApiError(400, 'Payment method is required'));
@@ -128,6 +128,8 @@ exports.placeOrder = async (req, res, next) => {
             items: orderItems,
             shippingAddress,
             billingAddress: billingAddress || shippingAddress,
+            deliveryNotes,
+            deliverySlot,
             coupon: cart.coupon,
             subTotal: cart.subTotal,
             discountAmount: cart.discountAmount,

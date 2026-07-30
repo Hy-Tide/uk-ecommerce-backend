@@ -37,8 +37,6 @@ exports.getOrderDetails = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id)
             .populate('user', 'name email')
-            .populate('shippingAddress')
-            .populate('billingAddress')
             .populate('items.product', 'name slug sku images')
             .populate('coupon', 'code discountType discountValue')
             .populate('deliveryPersonId', 'name email');
@@ -106,8 +104,6 @@ exports.printInvoice = async (req, res, next) => {
     try {
         const order = await Order.findById(req.params.id)
             .populate('user', 'name email')
-            .populate('shippingAddress')
-            .populate('billingAddress')
             .populate('items.product', 'name slug sku images');
 
         if (!order) {

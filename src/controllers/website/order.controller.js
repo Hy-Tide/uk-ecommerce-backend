@@ -16,8 +16,6 @@ exports.getMyOrders = async (req, res, next) => {
 exports.getOrderDetails = async (req, res, next) => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user._id })
-            .populate('shippingAddress')
-            .populate('billingAddress')
             .populate('items.product', 'name slug images')
             .populate('coupon', 'code discountType discountValue');
 
@@ -115,8 +113,6 @@ exports.reorder = async (req, res, next) => {
 exports.getInvoice = async (req, res, next) => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user._id })
-            .populate('shippingAddress')
-            .populate('billingAddress')
             .populate('items.product', 'name slug sku images');
 
         if (!order) {
