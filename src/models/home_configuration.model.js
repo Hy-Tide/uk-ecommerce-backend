@@ -5,10 +5,10 @@ const homeConfigurationSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Section type is required'],
         enum: [
-            'Hero Banner', 'Feature Highlights', 'Promotional Banner Grid', 'Categories', 
-            'Best Deals', 'Limited Products', 'Recommended Products', 'New Arrivals', 
-            'Recently Viewed', 'Featured Products', 'Trending Products', 'Best Sellers', 
-            'Brands', 'Recipes', 'Testimonials', 'Why Choose Us', 'Newsletter'
+            'Hero Banner', 'Service Features', 'Offer Banners', 'Shop by Categories',
+            'Today\'s Best Deals', 'Limited Products', 'Recommended Products', 'New Arrivals',
+            'Recently Viewed', 'Subscription Banner', 'Shop by Brands', 'Popular Recipes', 
+            'Testimonials', 'Why Choose Us', 'Newsletter'
         ]
     },
     title: {
@@ -30,8 +30,8 @@ const homeConfigurationSchema = new mongoose.Schema({
     },
     dataSource: {
         type: String,
-        enum: ['Manual', 'Automatic'],
-        default: 'Automatic'
+        enum: ['Featured Products', 'Latest Products', 'Manual Selection', 'Category Based', 'Brand Based', 'Offer Products', 'Manual', 'Automatic', 'manual', 'automatic'],
+        default: 'Featured Products'
     },
     productLimit: {
         type: Number,
@@ -85,6 +85,6 @@ const homeConfigurationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Banner'
     }]
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('HomeConfiguration', homeConfigurationSchema);

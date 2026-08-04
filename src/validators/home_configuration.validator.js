@@ -2,16 +2,16 @@ const { body } = require('express-validator');
 
 exports.homeConfigurationValidator = [
     body('sectionType').trim().notEmpty().withMessage('Section type is required').isIn([
-        'Hero Banner', 'Feature Highlights', 'Promotional Banner Grid', 'Categories', 
-        'Best Deals', 'Limited Products', 'Recommended Products', 'New Arrivals', 
-        'Recently Viewed', 'Featured Products', 'Trending Products', 'Best Sellers', 
-        'Brands', 'Recipes', 'Testimonials', 'Why Choose Us', 'Newsletter'
+        'Hero Banner', 'Service Features', 'Offer Banners', 'Shop by Categories',
+        'Today\'s Best Deals', 'Limited Products', 'Recommended Products', 'New Arrivals',
+        'Recently Viewed', 'Subscription Banner', 'Shop by Brands', 'Popular Recipes', 
+        'Testimonials', 'Why Choose Us', 'Newsletter'
     ]).withMessage('Invalid section type'),
     body('title').optional().trim(),
     body('subtitle').optional().trim(),
     body('enabled').optional().isBoolean().withMessage('Enabled must be a boolean'),
     body('displayOrder').notEmpty().withMessage('Display order is required').isInt({ min: 0 }).withMessage('Display order must be a non-negative integer'),
-    body('dataSource').optional().isIn(['Manual', 'Automatic']).withMessage('DataSource must be Manual or Automatic'),
+    body('dataSource').optional().isIn(['Featured Products', 'Latest Products', 'Manual Selection', 'Category Based', 'Brand Based', 'Offer Products', 'Manual', 'Automatic', 'manual', 'automatic']).withMessage('Invalid DataSource'),
     body('productLimit').optional().isInt({ min: 1 }).withMessage('Product limit must be at least 1'),
     body('filters').optional().isObject().withMessage('Filters must be an object'),
     body('buttonText').optional().trim(),
