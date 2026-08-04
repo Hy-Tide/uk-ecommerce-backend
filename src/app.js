@@ -73,6 +73,7 @@ const websiteCartRoutes = require('./routes/website/cart.routes');
 const websiteCouponRoutes = require('./routes/website/coupon.routes');
 const websiteCheckoutRoutes = require('./routes/website/checkout.routes');
 const websiteOrderRoutes = require('./routes/website/order.routes');
+const websiteHomeRoutes = require('./routes/website/home.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -82,6 +83,11 @@ const adminProductRoutes = require('./routes/admin/product.routes');
 const adminCustomerRoutes = require('./routes/admin/customer.routes');
 const adminCouponRoutes = require('./routes/admin/coupon.routes');
 const adminOrderRoutes = require('./routes/admin/order.routes');
+const adminUserRoutes = require('./routes/admin/user.routes');
+const adminBannerRoutes = require('./routes/admin/banner.routes');
+const adminTestimonialRoutes = require('./routes/admin/testimonial.routes');
+const adminRecipeRoutes = require('./routes/admin/recipe.routes');
+const adminHomeConfigRoutes = require('./routes/admin/home_configuration.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -106,6 +112,7 @@ app.use(`${API_PREFIX}/website/cart`, websiteCartRoutes);
 app.use(`${API_PREFIX}/website/coupons`, websiteCouponRoutes);
 app.use(`${API_PREFIX}/website/checkout`, websiteCheckoutRoutes);
 app.use(`${API_PREFIX}/website/orders`, websiteOrderRoutes);
+app.use(`${API_PREFIX}/website/home`, websiteHomeRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -115,6 +122,11 @@ app.use(`${API_PREFIX}/admin/products`, adminProductRoutes);
 app.use(`${API_PREFIX}/admin/customers`, adminCustomerRoutes);
 app.use(`${API_PREFIX}/admin/coupons`, adminCouponRoutes);
 app.use(`${API_PREFIX}/admin/orders`, adminOrderRoutes);
+app.use(`${API_PREFIX}/admin/users`, adminUserRoutes);
+app.use(`${API_PREFIX}/admin/banners`, adminBannerRoutes);
+app.use(`${API_PREFIX}/admin/testimonials`, adminTestimonialRoutes);
+app.use(`${API_PREFIX}/admin/recipes`, adminRecipeRoutes);
+app.use(`${API_PREFIX}/admin/home-config`, adminHomeConfigRoutes);
 
 // Root Route for Render Health Checks    
 app.get('/', (req, res) => {

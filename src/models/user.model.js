@@ -49,6 +49,22 @@ const userSchema = new mongoose.Schema(
         is_blocked: {
             type: Boolean,
             default: false,
+        },
+        otp: {
+            type: String,
+        },
+        otpExpires: {
+            type: Date,
+        },
+        isEmailVerified: {
+            type: Boolean,
+            default: false,
+        },
+        resetPasswordToken: {
+            type: String,
+        },
+        resetPasswordExpires: {
+            type: Date,
         }
     },
     {
