@@ -34,8 +34,7 @@ exports.getSectionById = async (req, res, next) => {
             .populate('subCategoryIds', 'name slug')
             .populate('brandIds', 'name slug image_url')
             .populate('recipeIds', 'title image_url')
-            .populate('testimonialIds', 'customerName content rating')
-            .populate('bannerIds', 'title image_url link');
+            .populate('testimonialIds', 'customerName content rating');
             
         if (!section) {
             return next(new ApiError(404, 'Section not found'));

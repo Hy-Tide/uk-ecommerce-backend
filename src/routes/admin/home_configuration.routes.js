@@ -49,6 +49,36 @@ const { homeConfigurationValidator, reorderValidator } = require('../../validato
  *                 type: string
  *               buttonUrl:
  *                 type: string
+ *               highlightTitle:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               desktopImage:
+ *                 type: string
+ *               mobileImage:
+ *                 type: string
+ *               backgroundImage:
+ *                 type: string
+ *               iconImage:
+ *                 type: string
+ *               bannerImage:
+ *                 type: string
+ *               primaryButtonText:
+ *                 type: string
+ *               primaryButtonUrl:
+ *                 type: string
+ *               secondaryButtonText:
+ *                 type: string
+ *               secondaryButtonUrl:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean
+ *               settings:
+ *                 type: object
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
  *     responses:
  *       201:
  *         description: Home configuration section created successfully
@@ -147,6 +177,36 @@ router.route('/reorder')
  *                 type: string
  *               buttonUrl:
  *                 type: string
+ *               highlightTitle:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               desktopImage:
+ *                 type: string
+ *               mobileImage:
+ *                 type: string
+ *               backgroundImage:
+ *                 type: string
+ *               iconImage:
+ *                 type: string
+ *               bannerImage:
+ *                 type: string
+ *               primaryButtonText:
+ *                 type: string
+ *               primaryButtonUrl:
+ *                 type: string
+ *               secondaryButtonText:
+ *                 type: string
+ *               secondaryButtonUrl:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean
+ *               settings:
+ *                 type: object
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
  *     responses:
  *       200:
  *         description: Section updated successfully

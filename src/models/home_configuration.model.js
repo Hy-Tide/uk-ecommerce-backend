@@ -19,6 +19,20 @@ const homeConfigurationSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    highlightTitle: { type: String, trim: true },
+    description: { type: String, trim: true },
+    desktopImage: { type: String },
+    mobileImage: { type: String },
+    backgroundImage: { type: String },
+    iconImage: { type: String },
+    bannerImage: { type: String },
+    primaryButtonText: { type: String, trim: true },
+    primaryButtonUrl: { type: String, trim: true },
+    secondaryButtonText: { type: String, trim: true },
+    secondaryButtonUrl: { type: String, trim: true },
+    isActive: { type: Boolean, default: true },
+    settings: { type: mongoose.Schema.Types.Mixed, default: {} },
+    items: [{ type: mongoose.Schema.Types.Mixed }],
     enabled: {
         type: Boolean,
         default: true
@@ -80,10 +94,6 @@ const homeConfigurationSchema = new mongoose.Schema({
     testimonialIds: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Testimonial'
-    }],
-    bannerIds: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Banner'
     }]
 }, { timestamps: true, strict: false });
 
