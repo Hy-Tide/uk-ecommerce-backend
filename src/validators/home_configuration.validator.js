@@ -22,7 +22,20 @@ exports.homeConfigurationValidator = [
     body('brandIds').optional().isArray().withMessage('Brand IDs must be an array'),
     body('recipeIds').optional().isArray().withMessage('Recipe IDs must be an array'),
     body('testimonialIds').optional().isArray().withMessage('Testimonial IDs must be an array'),
-    body('bannerIds').optional().isArray().withMessage('Banner IDs must be an array')
+    body('bannerIds').optional().isArray().withMessage('Banner IDs must be an array'),
+    body('highlightTitle').optional().trim(),
+    body('description').optional().trim(),
+    body('desktopImage').optional().trim(),
+    body('mobileImage').optional().trim(),
+    body('backgroundImage').optional().trim(),
+    body('iconImage').optional().trim(),
+    body('bannerImage').optional().trim(),
+    body('primaryButtonText').optional().trim(),
+    body('primaryButtonUrl').optional().trim(),
+    body('secondaryButtonText').optional().trim(),
+    body('secondaryButtonUrl').optional().trim(),
+    body('settings').optional().isObject(),
+    body('items').optional().isArray()
 ];
 
 exports.reorderValidator = [

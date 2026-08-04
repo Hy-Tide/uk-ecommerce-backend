@@ -147,10 +147,23 @@ exports.resolveSectionData = async (section) => {
         _id: section._id,
         sectionType: section.sectionType,
         title: section.title,
+        highlightTitle: section.highlightTitle,
         subtitle: section.subtitle,
+        description: section.description,
+        desktopImage: section.desktopImage,
+        mobileImage: section.mobileImage,
+        backgroundImage: section.backgroundImage,
+        iconImage: section.iconImage,
+        bannerImage: section.bannerImage,
+        primaryButtonText: section.primaryButtonText,
+        primaryButtonUrl: section.primaryButtonUrl,
+        secondaryButtonText: section.secondaryButtonText,
+        secondaryButtonUrl: section.secondaryButtonUrl,
         displayOrder: section.displayOrder,
         buttonText: section.buttonText,
         buttonUrl: section.buttonUrl,
+        settings: section.settings,
+        items: section.items,
         data: data
     };
 };
