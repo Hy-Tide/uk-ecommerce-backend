@@ -108,6 +108,7 @@ const adminNotificationRoutes = require('./routes/admin/notification.routes');
 const adminSearchRoutes = require('./routes/admin/search.routes');
 const adminPaymentRoutes = require('./routes/admin/payment.routes');
 const adminDashboardRoutes = require('./routes/admin/dashboard.routes');
+const adminReportRoutes = require('./routes/admin/report.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -163,6 +164,7 @@ app.use(`${API_PREFIX}/admin/notifications`, adminNotificationRoutes);
 app.use(`${API_PREFIX}/admin/search`, adminSearchRoutes);
 app.use(`${API_PREFIX}/admin/payments`, adminPaymentRoutes);
 app.use(`${API_PREFIX}/admin/dashboard`, adminDashboardRoutes);
+app.use(`${API_PREFIX}/admin/reports`, adminReportRoutes);
 
 // Root Route for Render Health Checks    
 app.get('/', (req, res) => {

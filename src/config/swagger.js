@@ -21,6 +21,26 @@ const baseDefinition = {
         bearerFormat: 'JWT',
       },
     },
+    parameters: {
+      FormatParam: {
+        in: 'query',
+        name: 'format',
+        schema: { type: 'string', enum: ['json', 'csv', 'excel', 'pdf'], default: 'json' },
+        description: 'Export format'
+      },
+      StartDateParam: {
+        in: 'query',
+        name: 'startDate',
+        schema: { type: 'string', format: 'date' },
+        description: 'Filter from this date (YYYY-MM-DD)'
+      },
+      EndDateParam: {
+        in: 'query',
+        name: 'endDate',
+        schema: { type: 'string', format: 'date' },
+        description: 'Filter up to this date (YYYY-MM-DD)'
+      }
+    }
   },
   security: [
     {
