@@ -2,6 +2,7 @@ const AdminUser = require('../../models/admin_user.model');
 const AuthService = require('../../services/auth.service');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
+const { logAdminAction } = require('../../utils/audit.util');
 
 exports.login = async (req, res, next) => {
     try {
@@ -22,6 +23,8 @@ exports.login = async (req, res, next) => {
 
         user.last_login = Date.now();
         await user.save({ validateBeforeSave: false });
+
+        await logAdminAction(user._id, 'LOGIN', 'admin_users', user._id, {}, req.ip);
 
         const tokens = AuthService.generateTokens(user, 'admin');
 
@@ -52,7 +55,7 @@ exports.create = async (req, res, next) => {
             name,
             email,
             password,
-            // role_id: req.body.role_id // Will be required once roles are implemented
+            role_id: req.body.role_id
         });
 
         res.status(201).json(new ApiResponse(201, {

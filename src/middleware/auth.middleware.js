@@ -55,7 +55,7 @@ exports.protectAdmin = async (req, res, next) => {
             return res.status(401).json(unauthorizedResponse);
         }
 
-        const currentAdmin = await AdminUser.findById(decoded.id);
+        const currentAdmin = await AdminUser.findById(decoded.id).populate('role_id');
         if (!currentAdmin || currentAdmin.status !== 'active') {
             return res.status(401).json(unauthorizedResponse);
         }
@@ -67,4 +67,25 @@ exports.protectAdmin = async (req, res, next) => {
         // Catch invalid or expired token errors from jwt.verify
         return res.status(401).json(unauthorizedResponse);
     }
+};
+
+exports.requirePermission = (permission) => {
+    return async (req, res, next) => {
+        try {
+            if (!req.user || !req.user.role_id) {
+                return next(new ApiError(403, 'Access denied. No role assigned.'));
+            }
+
+            const userPermissions = req.user.role_id.permissions || [];
+
+            // Admin role usually has '*'
+            if (userPermissions.includes('*') || userPermissions.includes('all') || userPermissions.includes(permission)) {
+                return next();
+            }
+
+            return next(new ApiError(403, `Access denied. Requires permission: ${permission}`));
+        } catch (error) {
+            return next(new ApiError(500, 'Error checking permissions'));
+        }
+    };
 };

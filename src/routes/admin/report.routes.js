@@ -10,6 +10,87 @@ const authMiddleware = require('../../middleware/auth.middleware');
  *   description: Exportable data reports for analytics
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SalesReportItem:
+ *       type: object
+ *       properties:
+ *         orderNumber: { type: string }
+ *         date: { type: string }
+ *         subTotal: { type: number }
+ *         discount: { type: number }
+ *         shipping: { type: number }
+ *         total: { type: number }
+ *     CustomerReportItem:
+ *       type: object
+ *       properties:
+ *         name: { type: string }
+ *         email: { type: string }
+ *         phone: { type: string }
+ *         joinedDate: { type: string }
+ *         totalOrders: { type: integer }
+ *         totalSpent: { type: string }
+ *     OrderReportItem:
+ *       type: object
+ *       properties:
+ *         orderNumber: { type: string }
+ *         date: { type: string }
+ *         customer: { type: string }
+ *         status: { type: string }
+ *         paymentStatus: { type: string }
+ *         itemsCount: { type: integer }
+ *         total: { type: number }
+ *     InventoryReportItem:
+ *       type: object
+ *       properties:
+ *         name: { type: string }
+ *         sku: { type: string }
+ *         category: { type: string }
+ *         variation: { type: string }
+ *         stock: { type: integer }
+ *         status: { type: string }
+ *     CouponReportItem:
+ *       type: object
+ *       properties:
+ *         code: { type: string }
+ *         type: { type: string }
+ *         discount: { type: string }
+ *         usageCount: { type: integer }
+ *         status: { type: string }
+ *     TaxReportItem:
+ *       type: object
+ *       properties:
+ *         orderNumber: { type: string }
+ *         date: { type: string }
+ *         subTotal: { type: string }
+ *         discount: { type: string }
+ *         taxableAmount: { type: string }
+ *         tax: { type: string }
+ *         total: { type: string }
+ *     DeliveryReportItem:
+ *       type: object
+ *       properties:
+ *         orderNumber: { type: string }
+ *         date: { type: string }
+ *         customer: { type: string }
+ *         phone: { type: string }
+ *         address: { type: string }
+ *         status: { type: string }
+ *         deliverySlot: { type: string }
+ *     PaymentReportItem:
+ *       type: object
+ *       properties:
+ *         orderNumber: { type: string }
+ *         date: { type: string }
+ *         customer: { type: string }
+ *         intentId: { type: string }
+ *         amount: { type: string }
+ *         status: { type: string }
+ *         refundAmount: { type: string }
+ */
+
 router.use(authMiddleware.protectAdmin);
 
 // Common parameters for most reports
@@ -49,6 +130,17 @@ const reportParams = [
  *     responses:
  *       200:
  *         description: Sales report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/SalesReportItem'
  */
 router.get('/sales', reportController.getSalesReport);
 
@@ -67,6 +159,17 @@ router.get('/sales', reportController.getSalesReport);
  *     responses:
  *       200:
  *         description: Customer report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CustomerReportItem'
  */
 router.get('/customers', reportController.getCustomerReport);
 
@@ -85,6 +188,17 @@ router.get('/customers', reportController.getCustomerReport);
  *     responses:
  *       200:
  *         description: Order report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/OrderReportItem'
  */
 router.get('/orders', reportController.getOrderReport);
 
@@ -101,6 +215,17 @@ router.get('/orders', reportController.getOrderReport);
  *     responses:
  *       200:
  *         description: Inventory report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/InventoryReportItem'
  */
 router.get('/inventory', reportController.getInventoryReport);
 
@@ -119,6 +244,17 @@ router.get('/inventory', reportController.getInventoryReport);
  *     responses:
  *       200:
  *         description: Coupon report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CouponReportItem'
  */
 router.get('/coupons', reportController.getCouponReport);
 
@@ -137,6 +273,17 @@ router.get('/coupons', reportController.getCouponReport);
  *     responses:
  *       200:
  *         description: Tax report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/TaxReportItem'
  */
 router.get('/taxes', reportController.getTaxReport);
 
@@ -155,6 +302,17 @@ router.get('/taxes', reportController.getTaxReport);
  *     responses:
  *       200:
  *         description: Delivery report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DeliveryReportItem'
  */
 router.get('/deliveries', reportController.getDeliveryReport);
 
@@ -173,6 +331,17 @@ router.get('/deliveries', reportController.getDeliveryReport);
  *     responses:
  *       200:
  *         description: Payment report retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 count: { type: integer }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PaymentReportItem'
  */
 router.get('/payments', reportController.getPaymentReport);
 

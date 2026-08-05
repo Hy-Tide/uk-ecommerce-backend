@@ -33,7 +33,7 @@ const adminUserSchema = new mongoose.Schema(
         role_id: {
             type: mongoose.Schema.ObjectId,
             ref: 'Role',
-            // required: true // Can be added once Roles are implemented
+            required: [true, 'Please provide a role']
         },
         last_login: {
             type: Date,

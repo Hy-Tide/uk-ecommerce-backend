@@ -1,4 +1,22 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const m2s = require('mongoose-to-swagger');
+const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
+
+// Auto-load all models so mongoose knows about them
+const modelsPath = path.join(__dirname, '../models');
+fs.readdirSync(modelsPath).forEach(file => {
+  if (file.endsWith('.js')) {
+    require(path.join(modelsPath, file));
+  }
+});
+
+// Convert all registered models to Swagger schemas
+const schemas = {};
+for (const modelName in mongoose.models) {
+  schemas[modelName] = m2s(mongoose.models[modelName]);
+}
 
 const baseDefinition = {
   openapi: '3.0.0',
@@ -40,7 +58,8 @@ const baseDefinition = {
         schema: { type: 'string', format: 'date' },
         description: 'Filter up to this date (YYYY-MM-DD)'
       }
-    }
+    },
+    schemas: schemas
   },
   security: [
     {

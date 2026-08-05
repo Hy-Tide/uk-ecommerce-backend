@@ -2,6 +2,7 @@ require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/db');
 const logger = require('./config/logger');
+const { seedRoles } = require('./utils/seed.util');
 
 // Handling Uncaught Exceptions
 process.on('uncaughtException', (err) => {
@@ -12,6 +13,7 @@ process.on('uncaughtException', (err) => {
 const startServer = async () => {
     try {
         await connectDB();
+        await seedRoles();
 
         const PORT = process.env.PORT || 5000;
         const server = app.listen(PORT, () => {
