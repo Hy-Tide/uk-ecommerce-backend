@@ -28,6 +28,33 @@ router.use(authMiddleware.protectAdmin);
  *     tags: [Admin Offers]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               bannerImage:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               isActive:
+ *                 type: boolean
  *     responses:
  *       201:
  *         description: Offer created successfully
@@ -64,6 +91,31 @@ router.route('/')
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               bannerImage:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               isActive:
+ *                 type: boolean
  *     responses:
  *       200:
  *         description: Offer updated successfully

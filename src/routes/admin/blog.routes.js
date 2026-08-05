@@ -28,6 +28,45 @@ router.use(authMiddleware.protectAdmin);
  *     tags: [Admin Blogs]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - categoryId
+ *               - content
+ *             properties:
+ *               title:
+ *                 type: string
+ *               slug:
+ *                 type: string
+ *               categoryId:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               excerpt:
+ *                 type: string
+ *               coverImage:
+ *                 type: string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               metaTitle:
+ *                 type: string
+ *               metaDescription:
+ *                 type: string
+ *               metaKeywords:
+ *                 type: string
+ *               readingTime:
+ *                 type: integer
+ *               isPublished:
+ *                 type: boolean
  *     responses:
  *       201:
  *         description: Blog created successfully
@@ -64,6 +103,41 @@ router.route('/')
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               slug:
+ *                 type: string
+ *               categoryId:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               excerpt:
+ *                 type: string
+ *               coverImage:
+ *                 type: string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               metaTitle:
+ *                 type: string
+ *               metaDescription:
+ *                 type: string
+ *               metaKeywords:
+ *                 type: string
+ *               readingTime:
+ *                 type: integer
+ *               isPublished:
+ *                 type: boolean
  *     responses:
  *       200:
  *         description: Blog updated successfully
@@ -82,6 +156,8 @@ router.route('/')
  *       200:
  *         description: Blog deleted successfully
  */
+
+
 router.route('/:id')
     .get(blogController.getBlogById)
     .put(blogController.updateBlog)
