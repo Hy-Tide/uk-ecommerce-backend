@@ -248,3 +248,93 @@ exports.deleteProduct = async (req, res, next) => {
     }
 };
 
+exports.getMostViewedProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find().sort({ viewCount: -1 }).limit(20);
+        const mapped = products.map(p => ({
+            _id: p._id,
+            name: p.name,
+            viewCount: p.viewCount,
+            stock: (p.variations || []).reduce((acc, curr) => acc + (curr.stockQuantity || 0), 0)
+        }));
+        res.status(200).json(new ApiResponse(200, { products: mapped }, 'Most viewed products retrieved'));
+    } catch (error) { next(error); }
+};
+
+exports.getTrendingProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ isTrending: true });
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Trending products retrieved'));
+    } catch (error) { next(error); }
+};
+
+exports.getBestSellerProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ isBestSeller: true });
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Best seller products retrieved'));
+    } catch (error) { next(error); }
+};
+
+exports.getFeaturedProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ isFeatured: true });
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Featured products retrieved'));
+    } catch (error) { next(error); }
+};
+
+exports.getRelatedProducts = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return next(new ApiError(404, 'Product not found'));
+        
+        let query = { _id: { $ne: product._id } };
+        if (product.relatedProducts && product.relatedProducts.length > 0) {
+            query._id = { $in: product.relatedProducts, $ne: product._id };
+        } else {
+            query.categoryId = product.categoryId;
+        }
+
+        const products = await Product.find(query).limit(10);
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Related products retrieved'));
+    } catch (error) { next(error); }
+};
+
+exports.toggleFeatured = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return next(new ApiError(404, 'Product not found'));
+        product.isFeatured = !product.isFeatured;
+        await product.save();
+        res.status(200).json(new ApiResponse(200, { _id: product._id, isFeatured: product.isFeatured }, 'Featured status updated successfully'));
+    } catch (error) { next(error); }
+};
+
+exports.toggleBestSeller = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return next(new ApiError(404, 'Product not found'));
+        product.isBestSeller = !product.isBestSeller;
+        await product.save();
+        res.status(200).json(new ApiResponse(200, { _id: product._id, isBestSeller: product.isBestSeller }, 'Best seller status updated successfully'));
+    } catch (error) { next(error); }
+};
+
+exports.toggleStatus = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return next(new ApiError(404, 'Product not found'));
+        product.status = product.status === 'active' ? 'inactive' : 'active';
+        await product.save();
+        res.status(200).json(new ApiResponse(200, { _id: product._id, status: product.status }, 'Status updated successfully'));
+    } catch (error) { next(error); }
+};
+
+exports.toggleInStock = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return next(new ApiError(404, 'Product not found'));
+        product.inStock = !product.inStock;
+        await product.save();
+        res.status(200).json(new ApiResponse(200, { _id: product._id, inStock: product.inStock }, 'In-stock status updated successfully'));
+    } catch (error) { next(error); }
+};

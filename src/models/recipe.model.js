@@ -25,6 +25,10 @@ const recipeSchema = new mongoose.Schema({
     is_active: {
         type: Boolean,
         default: true
+    },
+    cuisine: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Cuisine'
     }
 }, { timestamps: true });
 

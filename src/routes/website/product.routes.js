@@ -67,6 +67,12 @@ const productController = require('../../controllers/website/product.controller'
  */
 router.get('/', productController.getProducts);
 
+router.get('/featured', productController.getFeaturedProducts);
+router.get('/best-selling', productController.getBestSellingProducts);
+router.get('/new-arrivals', productController.getNewArrivalsProducts);
+router.post('/recently-viewed', productController.getRecentlyViewedProducts);
+router.get('/:slug/related', productController.getRelatedProducts);
+
 /**
  * @swagger
  * /website/products/{slug}:

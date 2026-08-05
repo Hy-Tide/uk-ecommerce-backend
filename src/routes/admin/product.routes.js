@@ -259,6 +259,16 @@ router.route('/')
  *       200:
  *         description: Product deleted successfully
  */
+router.get('/most-viewed', authMiddleware.protectAdmin, productController.getMostViewedProducts);
+router.get('/trending', authMiddleware.protectAdmin, productController.getTrendingProducts);
+router.get('/best-seller', authMiddleware.protectAdmin, productController.getBestSellerProducts);
+router.get('/featured', authMiddleware.protectAdmin, productController.getFeaturedProducts);
+router.get('/:id/related', authMiddleware.protectAdmin, productController.getRelatedProducts);
+router.patch('/:id/toggle-featured', authMiddleware.protectAdmin, productController.toggleFeatured);
+router.patch('/:id/toggle-best-seller', authMiddleware.protectAdmin, productController.toggleBestSeller);
+router.patch('/:id/toggle-status', authMiddleware.protectAdmin, productController.toggleStatus);
+router.patch('/:id/toggle-instock', authMiddleware.protectAdmin, productController.toggleInStock);
+
 router.route('/:id')
     .get(productController.getProductById)
     .put(authMiddleware.protectAdmin, productController.updateProduct)

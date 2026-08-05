@@ -43,6 +43,10 @@ const productSchema = new mongoose.Schema({
     tags: [{ type: String }],
     inStock: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false, alias: 'is_featured' },
+    isBestSeller: { type: Boolean, default: false },
+    isTrending: { type: Boolean, default: false },
+    viewCount: { type: Number, default: 0 },
+    relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     displayOrder: { type: Number, default: 0 },
     status: { type: String, enum: ['draft', 'active', 'inactive'], default: 'draft' },
     variants: [variantSchema] // Kept for backward compatibility

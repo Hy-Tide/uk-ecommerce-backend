@@ -32,7 +32,7 @@ exports.getAllRecipes = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
 
-        const recipes = await Recipe.find(query).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+        const recipes = await Recipe.find(query).populate('cuisine', 'name image').skip(skip).limit(parseInt(limit)).sort('-createdAt');
         const total = await Recipe.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
@@ -46,7 +46,7 @@ exports.getAllRecipes = async (req, res, next) => {
 
 exports.getRecipeById = async (req, res, next) => {
     try {
-        const recipe = await Recipe.findById(req.params.id);
+        const recipe = await Recipe.findById(req.params.id).populate('cuisine', 'name image');
         if (!recipe) {
             return next(new ApiError(404, 'Recipe not found'));
         }

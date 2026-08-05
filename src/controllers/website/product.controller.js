@@ -142,7 +142,11 @@ exports.getProducts = async (req, res, next) => {
 
 exports.getProductBySlug = async (req, res, next) => {
     try {
-        const product = await Product.findOne({ slug: req.params.slug, status: 'active' })
+        const product = await Product.findOneAndUpdate(
+            { slug: req.params.slug, status: 'active' },
+            { $inc: { viewCount: 1 } },
+            { new: true }
+        )
             .populate('categoryId', 'name slug image icon')
             .populate('subCategoryId', 'name slug')
             .populate('brand', 'name slug');
@@ -234,3 +238,69 @@ exports.getProductsBySubCategory = async (req, res, next) => {
     }
 };
 
+exports.getRelatedProducts = async (req, res, next) => {
+    try {
+        const product = await Product.findOne({ slug: req.params.slug, status: 'active' });
+        if (!product) return next(new ApiError(404, 'Product not found'));
+
+        let query = { status: 'active', _id: { $ne: product._id } };
+        
+        if (product.relatedProducts && product.relatedProducts.length > 0) {
+            query._id = { $in: product.relatedProducts, $ne: product._id };
+        } else {
+            query.categoryId = product.categoryId;
+        }
+
+        const products = await Product.find(query).limit(10).populate('categoryId', 'name slug image icon');
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Related products retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getRecentlyViewedProducts = async (req, res, next) => {
+    try {
+        const { productIds } = req.body;
+        if (!Array.isArray(productIds) || productIds.length === 0) {
+            return res.status(200).json(new ApiResponse(200, { products: [] }, 'No recently viewed products'));
+        }
+
+        const products = await Product.find({ _id: { $in: productIds }, status: 'active' })
+            .populate('categoryId', 'name slug image icon');
+            
+        // Sort products to match the order of productIds
+        const productMap = new Map(products.map(p => [p._id.toString(), p]));
+        const sortedProducts = productIds.map(id => productMap.get(id.toString())).filter(Boolean);
+
+        res.status(200).json(new ApiResponse(200, { products: sortedProducts.map(mapProductList) }, 'Recently viewed products retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getFeaturedProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ status: 'active', isFeatured: true }).limit(10).populate('categoryId', 'name slug image icon');
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Featured products retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getBestSellingProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ status: 'active', isBestSeller: true }).limit(10).populate('categoryId', 'name slug image icon');
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Best selling products retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getNewArrivalsProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ status: 'active' }).sort({ createdAt: -1 }).limit(10).populate('categoryId', 'name slug image icon');
+        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'New arrivals retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
