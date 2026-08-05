@@ -40,6 +40,10 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// Payment Webhook (must be parsed as raw body before express.json is applied)
+const websitePaymentController = require('./controllers/website/payment.controller');
+app.post('/api/v1/website/payments/webhook', express.raw({ type: 'application/json' }), websitePaymentController.webhook);
+
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -80,6 +84,7 @@ const websiteBlogRoutes = require('./routes/website/blog.routes');
 const websiteEnquiryRoutes = require('./routes/website/enquiry.routes');
 const websiteNotificationRoutes = require('./routes/website/notification.routes');
 const websiteSearchRoutes = require('./routes/website/search.routes');
+const websitePaymentRoutes = require('./routes/website/payment.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -101,6 +106,7 @@ const adminBlogRoutes = require('./routes/admin/blog.routes');
 const adminEnquiryRoutes = require('./routes/admin/enquiry.routes');
 const adminNotificationRoutes = require('./routes/admin/notification.routes');
 const adminSearchRoutes = require('./routes/admin/search.routes');
+const adminPaymentRoutes = require('./routes/admin/payment.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -132,6 +138,7 @@ app.use(`${API_PREFIX}/website/blogs`, websiteBlogRoutes);
 app.use(`${API_PREFIX}/website/contact`, websiteEnquiryRoutes);
 app.use(`${API_PREFIX}/website/notifications`, websiteNotificationRoutes);
 app.use(`${API_PREFIX}/website/search`, websiteSearchRoutes);
+app.use(`${API_PREFIX}/website/payments`, websitePaymentRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -153,6 +160,7 @@ app.use(`${API_PREFIX}/admin/blogs`, adminBlogRoutes);
 app.use(`${API_PREFIX}/admin/enquiries`, adminEnquiryRoutes);
 app.use(`${API_PREFIX}/admin/notifications`, adminNotificationRoutes);
 app.use(`${API_PREFIX}/admin/search`, adminSearchRoutes);
+app.use(`${API_PREFIX}/admin/payments`, adminPaymentRoutes);
 
 // Root Route for Render Health Checks    
 app.get('/', (req, res) => {
