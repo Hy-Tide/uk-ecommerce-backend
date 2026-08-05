@@ -67,10 +67,81 @@ const productController = require('../../controllers/website/product.controller'
  */
 router.get('/', productController.getProducts);
 
+/**
+ * @swagger
+ * /website/products/featured:
+ *   get:
+ *     summary: Get featured products
+ *     tags: [Website Products]
+ *     responses:
+ *       200:
+ *         description: Featured products retrieved successfully
+ */
 router.get('/featured', productController.getFeaturedProducts);
+
+/**
+ * @swagger
+ * /website/products/best-selling:
+ *   get:
+ *     summary: Get best selling products
+ *     tags: [Website Products]
+ *     responses:
+ *       200:
+ *         description: Best selling products retrieved successfully
+ */
 router.get('/best-selling', productController.getBestSellingProducts);
+
+/**
+ * @swagger
+ * /website/products/new-arrivals:
+ *   get:
+ *     summary: Get new arrivals products
+ *     tags: [Website Products]
+ *     responses:
+ *       200:
+ *         description: New arrivals products retrieved successfully
+ */
 router.get('/new-arrivals', productController.getNewArrivalsProducts);
+
+/**
+ * @swagger
+ * /website/products/recently-viewed:
+ *   post:
+ *     summary: Get recently viewed products
+ *     tags: [Website Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Recently viewed products retrieved successfully
+ */
 router.post('/recently-viewed', productController.getRecentlyViewedProducts);
+
+/**
+ * @swagger
+ * /website/products/{slug}/related:
+ *   get:
+ *     summary: Get related products for a specific product slug
+ *     tags: [Website Products]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Related products retrieved successfully
+ */
 router.get('/:slug/related', productController.getRelatedProducts);
 
 /**

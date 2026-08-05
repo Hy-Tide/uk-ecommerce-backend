@@ -259,14 +259,160 @@ router.route('/')
  *       200:
  *         description: Product deleted successfully
  */
+/**
+ * @swagger
+ * /admin/products/most-viewed:
+ *   get:
+ *     summary: Get most viewed products
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Most viewed products retrieved successfully
+ */
 router.get('/most-viewed', authMiddleware.protectAdmin, productController.getMostViewedProducts);
+
+/**
+ * @swagger
+ * /admin/products/trending:
+ *   get:
+ *     summary: Get trending products
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trending products retrieved successfully
+ */
 router.get('/trending', authMiddleware.protectAdmin, productController.getTrendingProducts);
+
+/**
+ * @swagger
+ * /admin/products/best-seller:
+ *   get:
+ *     summary: Get best seller products
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Best seller products retrieved successfully
+ */
 router.get('/best-seller', authMiddleware.protectAdmin, productController.getBestSellerProducts);
+
+/**
+ * @swagger
+ * /admin/products/featured:
+ *   get:
+ *     summary: Get featured products
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Featured products retrieved successfully
+ */
 router.get('/featured', authMiddleware.protectAdmin, productController.getFeaturedProducts);
+
+/**
+ * @swagger
+ * /admin/products/{id}/related:
+ *   get:
+ *     summary: Get related products for a product ID
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Related products retrieved successfully
+ */
 router.get('/:id/related', authMiddleware.protectAdmin, productController.getRelatedProducts);
+
+/**
+ * @swagger
+ * /admin/products/{id}/toggle-featured:
+ *   patch:
+ *     summary: Toggle product featured status
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Featured status toggled successfully
+ */
 router.patch('/:id/toggle-featured', authMiddleware.protectAdmin, productController.toggleFeatured);
+
+/**
+ * @swagger
+ * /admin/products/{id}/toggle-best-seller:
+ *   patch:
+ *     summary: Toggle product best seller status
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Best seller status toggled successfully
+ */
 router.patch('/:id/toggle-best-seller', authMiddleware.protectAdmin, productController.toggleBestSeller);
+
+/**
+ * @swagger
+ * /admin/products/{id}/toggle-status:
+ *   patch:
+ *     summary: Toggle product active/inactive status
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Status toggled successfully
+ */
 router.patch('/:id/toggle-status', authMiddleware.protectAdmin, productController.toggleStatus);
+
+/**
+ * @swagger
+ * /admin/products/{id}/toggle-instock:
+ *   patch:
+ *     summary: Toggle product in-stock status
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: In-stock status toggled successfully
+ */
 router.patch('/:id/toggle-instock', authMiddleware.protectAdmin, productController.toggleInStock);
 
 router.route('/:id')

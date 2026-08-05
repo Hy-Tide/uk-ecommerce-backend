@@ -12,10 +12,76 @@ const authMiddleware = require('../../middleware/auth.middleware');
 
 router.use(authMiddleware.protectAdmin);
 
+/**
+ * @swagger
+ * /admin/blog-categories:
+ *   get:
+ *     summary: Get all blog categories
+ *     tags: [Admin Blog Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Blog categories retrieved successfully
+ *   post:
+ *     summary: Create a new blog category
+ *     tags: [Admin Blog Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Blog category created successfully
+ */
 router.route('/')
     .get(blogCategoryController.getAllBlogCategories)
     .post(blogCategoryController.createBlogCategory);
 
+/**
+ * @swagger
+ * /admin/blog-categories/{id}:
+ *   get:
+ *     summary: Get blog category by ID
+ *     tags: [Admin Blog Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog category retrieved successfully
+ *   put:
+ *     summary: Update a blog category
+ *     tags: [Admin Blog Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog category updated successfully
+ *   delete:
+ *     summary: Delete a blog category
+ *     tags: [Admin Blog Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog category deleted successfully
+ */
 router.route('/:id')
     .get(blogCategoryController.getBlogCategoryById)
     .put(blogCategoryController.updateBlogCategory)
