@@ -8,6 +8,10 @@ exports.createBlog = async (req, res, next) => {
     try {
         req.body.author = req.user._id; // Attach current admin as author
 
+        if (!req.body.slug && req.body.title) {
+            req.body.slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        }
+
         if (!req.body.categoryId || req.body.categoryId === '' || req.body.categoryId === 'null' || req.body.categoryId === 'undefined') {
             return next(new ApiError(400, 'Blog category is required'));
         }
@@ -80,6 +84,10 @@ exports.getBlogById = async (req, res, next) => {
 
 exports.updateBlog = async (req, res, next) => {
     try {
+        if (!req.body.slug && req.body.title) {
+            req.body.slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        }
+
         if (req.body.categoryId === '' || req.body.categoryId === 'null' || req.body.categoryId === 'undefined') {
             return next(new ApiError(400, 'Blog category is required'));
         }
