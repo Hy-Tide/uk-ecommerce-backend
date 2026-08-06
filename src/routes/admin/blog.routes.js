@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const blogController = require('../../controllers/admin/blog.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -31,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -53,6 +54,7 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               coverImage:
  *                 type: string
+ *                 format: binary
  *               tags:
  *                 type: array
  *                 items:
@@ -73,7 +75,7 @@ router.use(authMiddleware.protectAdmin);
  */
 router.route('/')
     .get(blogController.getAllBlogs)
-    .post(blogController.createBlog);
+    .post(upload.single('coverImage'), blogController.createBlog);
 
 /**
  * @swagger
@@ -106,7 +108,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -124,6 +126,7 @@ router.route('/')
  *                 type: string
  *               coverImage:
  *                 type: string
+ *                 format: binary
  *               tags:
  *                 type: array
  *                 items:
@@ -160,7 +163,7 @@ router.route('/')
 
 router.route('/:id')
     .get(blogController.getBlogById)
-    .put(blogController.updateBlog)
+    .put(upload.single('coverImage'), blogController.updateBlog)
     .delete(blogController.deleteBlog);
 
 module.exports = router;

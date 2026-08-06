@@ -1,10 +1,18 @@
 const Blog = require('../../models/blog.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
+const fs = require('fs');
+const path = require('path');
 
 exports.createBlog = async (req, res, next) => {
     try {
         req.body.author = req.user._id; // Attach current admin as author
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.coverImage = `${baseUrl}/uploads/${req.file.filename}`;
+        }
+
         const blog = await Blog.create(req.body);
         res.status(201).json(new ApiResponse(201, { blog }, 'Blog created successfully'));
     } catch (error) {
@@ -68,10 +76,26 @@ exports.getBlogById = async (req, res, next) => {
 
 exports.updateBlog = async (req, res, next) => {
     try {
-        const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        if (!blog) {
+        const existingBlog = await Blog.findById(req.params.id);
+        if (!existingBlog) {
             return next(new ApiError(404, 'Blog not found'));
         }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.coverImage = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = existingBlog.coverImage;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
+        }
+
+        const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         res.status(200).json(new ApiResponse(200, { blog }, 'Blog updated successfully'));
     } catch (error) {
         if (error.code === 11000) {
@@ -87,6 +111,15 @@ exports.deleteBlog = async (req, res, next) => {
         if (!blog) {
             return next(new ApiError(404, 'Blog not found'));
         }
+
+        if (blog.coverImage && blog.coverImage.includes('/uploads/')) {
+            const filename = blog.coverImage.split('/uploads/')[1];
+            const filePath = path.join(__dirname, '../../../uploads', filename);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
+
         res.status(200).json(new ApiResponse(200, null, 'Blog deleted successfully'));
     } catch (error) {
         next(error);
