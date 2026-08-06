@@ -90,6 +90,11 @@ exports.updateBlog = async (req, res, next) => {
             req.body.slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         }
 
+        // Prevent CastError if frontend sends string author name
+        if (req.body.author) {
+            delete req.body.author;
+        }
+
         if (req.body.categoryId === '' || req.body.categoryId === 'null' || req.body.categoryId === 'undefined') {
             return next(new ApiError(400, 'Blog category is required'));
         }
