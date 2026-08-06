@@ -8,9 +8,13 @@ exports.createBlog = async (req, res, next) => {
     try {
         req.body.author = req.user._id; // Attach current admin as author
 
+        if (!req.body.categoryId || req.body.categoryId === '' || req.body.categoryId === 'null' || req.body.categoryId === 'undefined') {
+            return next(new ApiError(400, 'Blog category is required'));
+        }
+
         if (req.file) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
-            req.body.coverImage = `${baseUrl}/uploads/${req.file.filename}`;
+            req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
         const blog = await Blog.create(req.body);
@@ -76,6 +80,10 @@ exports.getBlogById = async (req, res, next) => {
 
 exports.updateBlog = async (req, res, next) => {
     try {
+        if (req.body.categoryId === '' || req.body.categoryId === 'null' || req.body.categoryId === 'undefined') {
+            return next(new ApiError(400, 'Blog category is required'));
+        }
+
         const existingBlog = await Blog.findById(req.params.id);
         if (!existingBlog) {
             return next(new ApiError(404, 'Blog not found'));
@@ -83,9 +91,9 @@ exports.updateBlog = async (req, res, next) => {
 
         if (req.file) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
-            req.body.coverImage = `${baseUrl}/uploads/${req.file.filename}`;
+            req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
             
-            const oldImage = existingBlog.coverImage;
+            const oldImage = existingBlog.featuredImage;
             if (oldImage && oldImage.includes('/uploads/')) {
                 const oldFilename = oldImage.split('/uploads/')[1];
                 const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
@@ -112,8 +120,8 @@ exports.deleteBlog = async (req, res, next) => {
             return next(new ApiError(404, 'Blog not found'));
         }
 
-        if (blog.coverImage && blog.coverImage.includes('/uploads/')) {
-            const filename = blog.coverImage.split('/uploads/')[1];
+        if (blog.featuredImage && blog.featuredImage.includes('/uploads/')) {
+            const filename = blog.featuredImage.split('/uploads/')[1];
             const filePath = path.join(__dirname, '../../../uploads', filename);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);

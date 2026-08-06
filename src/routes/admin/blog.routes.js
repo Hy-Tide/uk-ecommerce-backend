@@ -52,7 +52,7 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               excerpt:
  *                 type: string
- *               coverImage:
+ *               featuredImage:
  *                 type: string
  *                 format: binary
  *               tags:
@@ -75,7 +75,7 @@ router.use(authMiddleware.protectAdmin);
  */
 router.route('/')
     .get(blogController.getAllBlogs)
-    .post(upload.single('coverImage'), blogController.createBlog);
+    .post(upload.single('featuredImage'), blogController.createBlog);
 
 /**
  * @swagger
@@ -124,7 +124,7 @@ router.route('/')
  *                 type: string
  *               excerpt:
  *                 type: string
- *               coverImage:
+ *               featuredImage:
  *                 type: string
  *                 format: binary
  *               tags:
@@ -163,7 +163,7 @@ router.route('/')
 
 router.route('/:id')
     .get(blogController.getBlogById)
-    .put(upload.single('coverImage'), blogController.updateBlog)
+    .put(upload.single('featuredImage'), blogController.updateBlog)
     .delete(blogController.deleteBlog);
 
 module.exports = router;
