@@ -19,6 +19,8 @@ exports.createBlog = async (req, res, next) => {
         if (req.file) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
+        } else if (req.body.coverImage) {
+            req.body.featuredImage = req.body.coverImage;
         }
 
         const blog = await Blog.create(req.body);
@@ -109,6 +111,8 @@ exports.updateBlog = async (req, res, next) => {
                     fs.unlinkSync(oldFilePath);
                 }
             }
+        } else if (req.body.coverImage) {
+            req.body.featuredImage = req.body.coverImage;
         }
 
         const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
