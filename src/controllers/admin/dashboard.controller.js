@@ -35,17 +35,8 @@ exports.getDashboardData = async (req, res, next) => {
         const deliveredOrdersCount = await Order.countDocuments({ orderStatus: 'Delivered' });
 
         // 7. Low Stock Products
-        // Products where any variation has stockQuantity <= minStockAlert (default min is 0 or user defined)
-        // Let's use $expr to compare stockQuantity to minStockAlert
-        const lowStockProducts = await Product.find({
-            variations: {
-                $elemMatch: {
-                    $expr: { $lte: ['$stockQuantity', { $ifNull: ['$minStockAlert', 5] }] }
-                }
-            }
-        }).select('name images sku inStock variations').limit(10);
-        // Fallback for simplicity if $expr inside $elemMatch doesn't work perfectly in older Mongo: 
-        // We'll just look for stockQuantity <= 5.
+        // Products where any variation has stockQuantity <= 5
+        // (Using a simple fallback query since $expr inside $elemMatch can cause errors)
         // Actually, $elemMatch with $lte is safer. Let's do:
         const lowStockProductsSafe = await Product.find({
             variations: {
