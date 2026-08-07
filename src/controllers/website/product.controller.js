@@ -1,4 +1,5 @@
 const Product = require('../../models/product.model');
+const OfferProduct = require('../../models/offer_product.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 
@@ -17,14 +18,37 @@ const calculateBadge = (price, salePrice, createdAt) => {
 };
 
 // Map for Website Product Listing
-const mapProductList = (prod) => {
+const mapProductList = (prod, activeOffer = null) => {
     let basePrice = 0;
     let discountPrice = 0;
     let badge = null;
+    let mappedVariations = [];
 
     if (prod.variations && prod.variations.length > 0) {
-        basePrice = prod.variations[0].regularPrice;
-        discountPrice = prod.variations[0].salePrice;
+        mappedVariations = prod.variations.map(v => {
+            let salePrice = v.salePrice;
+            if (activeOffer) {
+                if (activeOffer.discountType === 'percentage') {
+                    const discount = v.regularPrice * (activeOffer.discountValue / 100);
+                    salePrice = Math.max(0, v.regularPrice - discount);
+                } else if (activeOffer.discountType === 'fixed') {
+                    salePrice = Math.max(0, v.regularPrice - activeOffer.discountValue);
+                }
+            }
+            return {
+                _id: v._id,
+                weight: v.weight,
+                weightUnit: v.weightUnit,
+                regularPrice: v.regularPrice,
+                salePrice: salePrice,
+                stockQuantity: v.stockQuantity,
+                minStockAlert: v.minStockAlert,
+                displayWeight: v.displayWeight
+            };
+        });
+
+        basePrice = mappedVariations[0].regularPrice;
+        discountPrice = mappedVariations[0].salePrice;
         badge = calculateBadge(basePrice, discountPrice, prod.createdAt);
     } else {
         badge = calculateBadge(0, 0, prod.createdAt);
@@ -44,23 +68,15 @@ const mapProductList = (prod) => {
         subCategory: prod.subCategoryId, // Ideally populated
         displayOrder: prod.displayOrder,
         mainImage: prod.images && prod.images.length > 0 ? prod.images[0] : null,
-        variations: prod.variations ? prod.variations.map(v => ({
-            _id: v._id,
-            weight: v.weight,
-            weightUnit: v.weightUnit,
-            regularPrice: v.regularPrice,
-            salePrice: v.salePrice,
-            stockQuantity: v.stockQuantity,
-            minStockAlert: v.minStockAlert,
-            displayWeight: v.displayWeight
-        })) : [],
-        badge: badge
+        variations: mappedVariations,
+        badge: badge,
+        activeOffer: activeOffer ? { id: activeOffer._id, title: activeOffer.title } : null
     };
 };
 
 // Map for Website Product Details
-const mapProductDetail = (prod) => {
-    const listFields = mapProductList(prod);
+const mapProductDetail = (prod, activeOffer = null) => {
+    const listFields = mapProductList(prod, activeOffer);
     
     const totalStock = (prod.variations || []).reduce((acc, curr) => acc + (curr.stockQuantity || 0), 0);
 
@@ -78,6 +94,31 @@ const mapProductDetail = (prod) => {
         reviewCount: 0, 
         soldCount: "0+ sold recently"
     };
+};
+
+const applyOffersToProducts = async (products, isDetail = false) => {
+    if (!products || products.length === 0) return [];
+    
+    const productIds = products.map(p => p._id);
+    const mappings = await OfferProduct.find({ productId: { $in: productIds } }).populate('offerId');
+    const now = new Date();
+    
+    const activeOfferMap = new Map();
+    mappings.forEach(m => {
+        const offer = m.offerId;
+        if (offer && offer.isActive && now >= offer.startDate && now <= offer.endDate) {
+            if (!offer.scheduledAt || now >= offer.scheduledAt) {
+                if (!activeOfferMap.has(m.productId.toString())) {
+                    activeOfferMap.set(m.productId.toString(), offer);
+                }
+            }
+        }
+    });
+
+    return products.map(prod => {
+        const activeOffer = activeOfferMap.get(prod._id.toString());
+        return isDetail ? mapProductDetail(prod, activeOffer) : mapProductList(prod, activeOffer);
+    });
 };
 
 exports.getProducts = async (req, res, next) => {
@@ -131,8 +172,9 @@ exports.getProducts = async (req, res, next) => {
             
         const total = await Product.countDocuments(query);
 
+        const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, {
-            products: products.map(mapProductList),
+            products: mappedProducts,
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Products retrieved successfully'));
     } catch (error) {
@@ -154,7 +196,9 @@ exports.getProductBySlug = async (req, res, next) => {
         if (!product) {
             return next(new ApiError(404, 'Product not found or inactive'));
         }
-        res.status(200).json(new ApiResponse(200, { product: mapProductDetail(product) }, 'Product retrieved successfully'));
+        
+        const mappedProducts = await applyOffersToProducts([product], true);
+        res.status(200).json(new ApiResponse(200, { product: mappedProducts[0] }, 'Product retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -190,8 +234,9 @@ exports.getProductsByCategory = async (req, res, next) => {
             
         const total = await Product.countDocuments(query);
 
+        const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, {
-            products: products.map(mapProductList),
+            products: mappedProducts,
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Products by category retrieved successfully'));
     } catch (error) {
@@ -229,8 +274,9 @@ exports.getProductsBySubCategory = async (req, res, next) => {
             
         const total = await Product.countDocuments(query);
 
+        const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, {
-            products: products.map(mapProductList),
+            products: mappedProducts,
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Products by sub-category retrieved successfully'));
     } catch (error) {
@@ -252,7 +298,8 @@ exports.getRelatedProducts = async (req, res, next) => {
         }
 
         const products = await Product.find(query).limit(10).populate('categoryId', 'name slug image icon');
-        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Related products retrieved successfully'));
+        const mappedProducts = await applyOffersToProducts(products);
+        res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Related products retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -271,8 +318,8 @@ exports.getRecentlyViewedProducts = async (req, res, next) => {
         // Sort products to match the order of productIds
         const productMap = new Map(products.map(p => [p._id.toString(), p]));
         const sortedProducts = productIds.map(id => productMap.get(id.toString())).filter(Boolean);
-
-        res.status(200).json(new ApiResponse(200, { products: sortedProducts.map(mapProductList) }, 'Recently viewed products retrieved successfully'));
+        const mappedProducts = await applyOffersToProducts(sortedProducts);
+        res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Recently viewed products retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -281,7 +328,8 @@ exports.getRecentlyViewedProducts = async (req, res, next) => {
 exports.getFeaturedProducts = async (req, res, next) => {
     try {
         const products = await Product.find({ status: 'active', isFeatured: true }).limit(10).populate('categoryId', 'name slug image icon');
-        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Featured products retrieved successfully'));
+        const mappedProducts = await applyOffersToProducts(products);
+        res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Featured products retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -290,7 +338,8 @@ exports.getFeaturedProducts = async (req, res, next) => {
 exports.getBestSellingProducts = async (req, res, next) => {
     try {
         const products = await Product.find({ status: 'active', isBestSeller: true }).limit(10).populate('categoryId', 'name slug image icon');
-        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Best selling products retrieved successfully'));
+        const mappedProducts = await applyOffersToProducts(products);
+        res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Best selling products retrieved successfully'));
     } catch (error) {
         next(error);
     }
@@ -299,7 +348,8 @@ exports.getBestSellingProducts = async (req, res, next) => {
 exports.getNewArrivalsProducts = async (req, res, next) => {
     try {
         const products = await Product.find({ status: 'active' }).sort({ createdAt: -1 }).limit(10).populate('categoryId', 'name slug image icon');
-        res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'New arrivals retrieved successfully'));
+        const mappedProducts = await applyOffersToProducts(products);
+        res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'New arrivals retrieved successfully'));
     } catch (error) {
         next(error);
     }

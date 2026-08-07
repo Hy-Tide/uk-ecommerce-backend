@@ -34,25 +34,33 @@ exports.broadcastNotification = async (req, res, next) => {
         }
 
         // Fetch all active users. 
-        // Note: Assuming 'is_active' is the field in User model that determines if a user is active. 
-        // Adjust if it is named differently (e.g., 'isActive' or 'status').
         const users = await User.find({ is_active: true }, '_id');
 
         if (!users || users.length === 0) {
             return next(new ApiError(404, 'No active users found to broadcast to'));
         }
 
-        const notifications = users.map(user => ({
+        const recipients = users.map(user => ({
+            userId: user._id,
+            status: 'sent',
+            isRead: false
+        }));
+
+        const notification = await Notification.create({
             title,
             message,
             type: type || 'General',
-            userId: user._id,
+            isBroadcast: true,
+            recipients,
+            deliveryStats: {
+                total: users.length,
+                sent: users.length,
+                failed: 0
+            },
             createdBy: req.user._id
-        }));
+        });
 
-        await Notification.insertMany(notifications);
-
-        res.status(201).json(new ApiResponse(201, { count: notifications.length }, 'Broadcast notification sent successfully to all active users'));
+        res.status(201).json(new ApiResponse(201, { count: users.length, notificationId: notification._id }, 'Broadcast notification sent successfully to all active users'));
     } catch (error) {
         next(error);
     }

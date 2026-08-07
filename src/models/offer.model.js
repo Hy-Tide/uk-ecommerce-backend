@@ -34,10 +34,9 @@ const offerSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    products: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
-    }]
+    scheduledAt: {
+        type: Date
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Offer', offerSchema);

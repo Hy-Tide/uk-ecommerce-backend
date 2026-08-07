@@ -14,10 +14,17 @@ const recipeSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    ingredients: [{
-        type: String,
-        trim: true
-    }],
+    ingredients: {
+        type: [String],
+        validate: [
+            {
+                validator: function(arr) {
+                    return arr.every(i => typeof i === 'string' && i.trim().length > 0);
+                },
+                message: 'Ingredients cannot contain empty values'
+            }
+        ]
+    },
     instructions: {
         type: String,
         trim: true

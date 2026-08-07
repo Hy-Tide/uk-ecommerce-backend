@@ -18,11 +18,25 @@ const notificationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: [true, 'User ID is required']
+        required: function() { return !this.isBroadcast; }
     },
     isRead: {
         type: Boolean,
         default: false
+    },
+    isBroadcast: {
+        type: Boolean,
+        default: false
+    },
+    recipients: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        status: { type: String, enum: ['sent', 'failed'], default: 'sent' },
+        isRead: { type: Boolean, default: false }
+    }],
+    deliveryStats: {
+        total: { type: Number, default: 0 },
+        sent: { type: Number, default: 0 },
+        failed: { type: Number, default: 0 }
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,3 +45,4 @@ const notificationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('Notification', notificationSchema);
+

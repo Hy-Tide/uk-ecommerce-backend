@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const offerController = require('../../controllers/admin/offer.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -31,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -43,16 +44,16 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               bannerImage:
  *                 type: string
+ *                 format: binary
  *               startDate:
  *                 type: string
  *                 format: date-time
  *               endDate:
  *                 type: string
  *                 format: date-time
- *               productIds:
- *                 type: array
- *                 items:
- *                   type: string
+ *               scheduledAt:
+ *                 type: string
+ *                 format: date-time
  *               isActive:
  *                 type: boolean
  *     responses:
@@ -61,7 +62,7 @@ router.use(authMiddleware.protectAdmin);
  */
 router.route('/')
     .get(offerController.getAllOffers)
-    .post(offerController.createOffer);
+    .post(upload.single('bannerImage'), offerController.createOffer);
 
 /**
  * @swagger
@@ -94,7 +95,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -104,16 +105,16 @@ router.route('/')
  *                 type: string
  *               bannerImage:
  *                 type: string
+ *                 format: binary
  *               startDate:
  *                 type: string
  *                 format: date-time
  *               endDate:
  *                 type: string
  *                 format: date-time
- *               productIds:
- *                 type: array
- *                 items:
- *                   type: string
+ *               scheduledAt:
+ *                 type: string
+ *                 format: date-time
  *               isActive:
  *                 type: boolean
  *     responses:
@@ -136,7 +137,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(offerController.getOfferById)
-    .put(offerController.updateOffer)
+    .put(upload.single('bannerImage'), offerController.updateOffer)
     .delete(offerController.deleteOffer);
 
 /**
@@ -158,5 +159,79 @@ router.route('/:id')
  *         description: Offer status toggled successfully
  */
 router.patch('/:id/toggle-status', offerController.toggleOfferStatus);
+
+/**
+ * @swagger
+ * /admin/offers/{id}/products:
+ *   get:
+ *     summary: Get mapped products for an offer
+ *     tags: [Admin Offers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Products retrieved successfully
+ *   post:
+ *     summary: Map products to an offer
+ *     tags: [Admin Offers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productIds
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Products added to offer successfully
+ */
+router.route('/:id/products')
+    .get(offerController.getOfferProducts)
+    .post(offerController.addProductsToOffer);
+
+/**
+ * @swagger
+ * /admin/offers/{id}/products/{productId}:
+ *   delete:
+ *     summary: Remove a product from an offer
+ *     tags: [Admin Offers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product removed from offer successfully
+ */
+router.delete('/:id/products/:productId', offerController.removeProductFromOffer);
 
 module.exports = router;
