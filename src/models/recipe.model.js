@@ -36,7 +36,11 @@ const recipeSchema = new mongoose.Schema({
     cuisine: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cuisine'
-    }
+    },
+    products: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Recipe', recipeSchema);

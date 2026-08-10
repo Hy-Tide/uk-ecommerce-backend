@@ -24,6 +24,18 @@ const recipeController = require('../../controllers/website/recipe.controller');
  *         name: cuisineId
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: ingredient
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Recipes retrieved successfully

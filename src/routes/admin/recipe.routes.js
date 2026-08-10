@@ -39,6 +39,10 @@ const { recipeValidator } = require('../../validators/recipe.validator');
  *                 type: array
  *                 items:
  *                   type: string
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *               instructions:
  *                 type: string
  *               is_active:
@@ -64,6 +68,10 @@ const { recipeValidator } = require('../../validators/recipe.validator');
  *           type: integer
  *       - in: query
  *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: ingredient
  *         schema:
  *           type: string
  *     responses:
@@ -114,6 +122,10 @@ router.route('/')
  *               image_url:
  *                 type: string
  *               ingredients:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               products:
  *                 type: array
  *                 items:
  *                   type: string
