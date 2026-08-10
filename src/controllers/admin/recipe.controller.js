@@ -62,7 +62,7 @@ exports.getAllRecipes = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
 
-        const recipes = await Recipe.find(query).populate('cuisine', 'name image').populate('products').skip(skip).limit(parseInt(limit)).sort('-createdAt');
+        const recipes = await Recipe.find(query).select('-description -ingredients -instructions').populate('cuisine', 'name image').populate('products').skip(skip).limit(parseInt(limit)).sort('-createdAt');
         const total = await Recipe.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {

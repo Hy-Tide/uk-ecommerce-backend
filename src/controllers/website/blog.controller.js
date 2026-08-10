@@ -38,6 +38,7 @@ exports.getBlogs = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         const blogs = await Blog.find(query)
+            .select('-content')
             .populate('categoryId', 'name slug')
             .populate('author', 'name')
             .skip(skip)
@@ -90,6 +91,7 @@ exports.getRelatedBlogs = async (req, res, next) => {
                 { tags: { $in: currentBlog.tags } }
             ]
         })
+        .select('-content')
         .populate('categoryId', 'name slug')
         .sort({ publishedAt: -1, createdAt: -1 })
         .limit(4);
@@ -100,6 +102,7 @@ exports.getRelatedBlogs = async (req, res, next) => {
                 _id: { $ne: currentBlog._id },
                 isActive: true
             })
+            .select('-content')
             .populate('categoryId', 'name slug')
             .sort({ publishedAt: -1, createdAt: -1 })
             .limit(4);

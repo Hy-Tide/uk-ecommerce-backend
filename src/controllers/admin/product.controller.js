@@ -67,10 +67,6 @@ const mapProductList = (prod) => ({
     brand: prod.brand,
     name: prod.name,
     slug: prod.slug,
-    description: prod.description,
-    ingredients: prod.ingredients,
-    nutritionalInformation: prod.nutritionalInformation,
-    highlights: prod.highlights,
     variations: prod.variations,
     images: prod.images && prod.images.length > 0 ? [prod.images[0]] : [],
     isFeatured: prod.isFeatured,
@@ -184,7 +180,7 @@ exports.getAllProducts = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
 
-        const products = await Product.find(query).skip(skip).limit(parseInt(limit)).sort(sortOption);
+        const products = await Product.find(query).select('-description -ingredients -nutritionalInformation -highlights').skip(skip).limit(parseInt(limit)).sort(sortOption);
         const total = await Product.countDocuments(query);
 
         res.status(200).json(new ApiResponse(200, {
@@ -291,7 +287,7 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.getMostViewedProducts = async (req, res, next) => {
     try {
-        const products = await Product.find().sort({ viewCount: -1 }).limit(20);
+        const products = await Product.find().select('-description -ingredients -nutritionalInformation -highlights').sort({ viewCount: -1 }).limit(20);
         const mapped = products.map(p => ({
             _id: p._id,
             name: p.name,
@@ -304,21 +300,21 @@ exports.getMostViewedProducts = async (req, res, next) => {
 
 exports.getTrendingProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ isTrending: true });
+        const products = await Product.find({ isTrending: true }).select('-description -ingredients -nutritionalInformation -highlights');
         res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Trending products retrieved'));
     } catch (error) { next(error); }
 };
 
 exports.getBestSellerProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ isBestSeller: true });
+        const products = await Product.find({ isBestSeller: true }).select('-description -ingredients -nutritionalInformation -highlights');
         res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Best seller products retrieved'));
     } catch (error) { next(error); }
 };
 
 exports.getFeaturedProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ isFeatured: true });
+        const products = await Product.find({ isFeatured: true }).select('-description -ingredients -nutritionalInformation -highlights');
         res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Featured products retrieved'));
     } catch (error) { next(error); }
 };
@@ -335,7 +331,7 @@ exports.getRelatedProducts = async (req, res, next) => {
             query.categoryId = product.categoryId;
         }
 
-        const products = await Product.find(query).limit(10);
+        const products = await Product.find(query).select('-description -ingredients -nutritionalInformation -highlights').limit(10);
         res.status(200).json(new ApiResponse(200, { products: products.map(mapProductList) }, 'Related products retrieved'));
     } catch (error) { next(error); }
 };

@@ -52,6 +52,7 @@ exports.getAllBlogs = async (req, res, next) => {
 
         const skip = (page - 1) * limit;
         const blogs = await Blog.find(query)
+            .select('-content')
             .populate('categoryId', 'name slug')
             .populate('author', 'name email')
             .skip(skip)

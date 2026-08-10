@@ -24,7 +24,7 @@ exports.login = async (req, res, next) => {
         user.last_login = Date.now();
         await user.save({ validateBeforeSave: false });
 
-        await logAdminAction(user._id, 'LOGIN', 'admin_users', user._id, {}, req.ip);
+        await logAdminAction(user._id, 'LOGIN', user._id, 'admin_users', {}, req.ip);
 
         const tokens = AuthService.generateTokens(user, 'admin');
 

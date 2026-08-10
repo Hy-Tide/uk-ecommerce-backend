@@ -58,11 +58,6 @@ const mapProductList = (prod, activeOffer = null) => {
         id: prod._id, // Frontend often uses `id` instead of `_id`
         name: prod.name,
         slug: prod.slug,
-        description: prod.description,
-        ingredients: prod.ingredients,
-        nutritionalInformation: prod.nutritionalInformation,
-        nutritionalInfo: prod.nutritionalInformation,
-        highlights: prod.highlights,
         brand: prod.brand, // Ideally populated
         category: prod.categoryId, // Ideally populated
         subCategory: prod.subCategoryId, // Ideally populated
@@ -163,6 +158,7 @@ exports.getProducts = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         const products = await Product.find(query)
+            .select('-description -ingredients -nutritionalInformation -highlights')
             .skip(skip)
             .limit(parseInt(limit))
             .sort(sortOption)
@@ -225,6 +221,7 @@ exports.getProductsByCategory = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         const products = await Product.find(query)
+            .select('-description -ingredients -nutritionalInformation -highlights')
             .skip(skip)
             .limit(parseInt(limit))
             .sort(sortOption)
@@ -265,6 +262,7 @@ exports.getProductsBySubCategory = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         const products = await Product.find(query)
+            .select('-description -ingredients -nutritionalInformation -highlights')
             .skip(skip)
             .limit(parseInt(limit))
             .sort(sortOption)
@@ -297,7 +295,7 @@ exports.getRelatedProducts = async (req, res, next) => {
             query.categoryId = product.categoryId;
         }
 
-        const products = await Product.find(query).limit(10).populate('categoryId', 'name slug image icon');
+        const products = await Product.find(query).select('-description -ingredients -nutritionalInformation -highlights').limit(10).populate('categoryId', 'name slug image icon');
         const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Related products retrieved successfully'));
     } catch (error) {
@@ -313,6 +311,7 @@ exports.getRecentlyViewedProducts = async (req, res, next) => {
         }
 
         const products = await Product.find({ _id: { $in: productIds }, status: 'active' })
+            .select('-description -ingredients -nutritionalInformation -highlights')
             .populate('categoryId', 'name slug image icon');
             
         // Sort products to match the order of productIds
@@ -327,7 +326,7 @@ exports.getRecentlyViewedProducts = async (req, res, next) => {
 
 exports.getFeaturedProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ status: 'active', isFeatured: true }).limit(10).populate('categoryId', 'name slug image icon');
+        const products = await Product.find({ status: 'active', isFeatured: true }).select('-description -ingredients -nutritionalInformation -highlights').limit(10).populate('categoryId', 'name slug image icon');
         const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Featured products retrieved successfully'));
     } catch (error) {
@@ -337,7 +336,7 @@ exports.getFeaturedProducts = async (req, res, next) => {
 
 exports.getBestSellingProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ status: 'active', isBestSeller: true }).limit(10).populate('categoryId', 'name slug image icon');
+        const products = await Product.find({ status: 'active', isBestSeller: true }).select('-description -ingredients -nutritionalInformation -highlights').limit(10).populate('categoryId', 'name slug image icon');
         const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'Best selling products retrieved successfully'));
     } catch (error) {
@@ -347,7 +346,7 @@ exports.getBestSellingProducts = async (req, res, next) => {
 
 exports.getNewArrivalsProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({ status: 'active' }).sort({ createdAt: -1 }).limit(10).populate('categoryId', 'name slug image icon');
+        const products = await Product.find({ status: 'active' }).select('-description -ingredients -nutritionalInformation -highlights').sort({ createdAt: -1 }).limit(10).populate('categoryId', 'name slug image icon');
         const mappedProducts = await applyOffersToProducts(products);
         res.status(200).json(new ApiResponse(200, { products: mappedProducts }, 'New arrivals retrieved successfully'));
     } catch (error) {

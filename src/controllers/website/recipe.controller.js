@@ -27,6 +27,7 @@ exports.getRecipes = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         const recipes = await Recipe.find(query)
+            .select('-description -ingredients -instructions')
             .populate('cuisine', 'name image')
             .populate('products')
             .skip(skip)
