@@ -41,6 +41,8 @@ const upload = require('../../config/upload');
  *                 format: binary
  *               link:
  *                 type: string
+ *               description:
+ *                 type: string
  *               is_active:
  *                 type: boolean
  *     responses:
@@ -121,6 +123,8 @@ router.route('/')
  *                 type: string
  *                 format: binary
  *               link:
+ *                 type: string
+ *               description:
  *                 type: string
  *               is_active:
  *                 type: boolean
