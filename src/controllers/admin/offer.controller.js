@@ -2,13 +2,15 @@ const Offer = require('../../models/offer.model');
 const Product = require('../../models/product.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
-
+const fs = require('fs');
+const path = require('path');
 const OfferProduct = require('../../models/offer_product.model');
 
 exports.createOffer = async (req, res, next) => {
     try {
         if (req.file) {
-            req.body.bannerImage = req.file.filename;
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.bannerImage = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
         const offer = await Offer.create(req.body);
@@ -80,14 +82,27 @@ exports.getOfferById = async (req, res, next) => {
 
 exports.updateOffer = async (req, res, next) => {
     try {
-        if (req.file) {
-            req.body.bannerImage = req.file.filename;
-        }
-
-        const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const offer = await Offer.findById(req.params.id);
         if (!offer) {
             return next(new ApiError(404, 'Offer not found'));
         }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.bannerImage = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = offer.bannerImage;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
+        }
+
+        Object.assign(offer, req.body);
+        await offer.save();
         res.status(200).json(new ApiResponse(200, { offer }, 'Offer updated successfully'));
     } catch (error) {
         next(error);

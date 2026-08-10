@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../../controllers/admin/product.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const upload = require('../../config/upload');
 
 
 
@@ -23,7 +24,7 @@ const authMiddleware = require('../../middleware/auth.middleware');
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -149,7 +150,7 @@ const authMiddleware = require('../../middleware/auth.middleware');
  *         description: Products retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, productController.createProduct)
+    .post(authMiddleware.protectAdmin, upload.array('images', 5), productController.createProduct)
     .get(productController.getAllProducts);
 
 /**
@@ -181,7 +182,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -417,7 +418,7 @@ router.patch('/:id/toggle-instock', authMiddleware.protectAdmin, productControll
 
 router.route('/:id')
     .get(productController.getProductById)
-    .put(authMiddleware.protectAdmin, productController.updateProduct)
+    .put(authMiddleware.protectAdmin, upload.array('images', 5), productController.updateProduct)
     .delete(authMiddleware.protectAdmin, productController.deleteProduct);
 
 module.exports = router;

@@ -2,6 +2,8 @@ const Recipe = require('../../models/recipe.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 exports.createRecipe = async (req, res, next) => {
     try {
@@ -10,7 +12,31 @@ exports.createRecipe = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const recipe = await Recipe.create(req.body);
+        const {
+            title,
+            description,
+            ingredients,
+            products,
+            instructions,
+            is_active
+        } = req.body;
+
+        let image_url = req.body.image_url;
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            image_url = `${baseUrl}/uploads/${req.file.filename}`;
+        }
+
+        const recipe = await Recipe.create({
+            title,
+            description,
+            image_url,
+            ingredients,
+            products,
+            instructions,
+            is_active
+        });
+        
         res.status(201).json(new ApiResponse(201, { recipe }, 'Recipe created successfully'));
     } catch (error) {
         next(error);
@@ -67,7 +93,43 @@ exports.updateRecipe = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const {
+            title,
+            description,
+            image_url,
+            ingredients,
+            products,
+            instructions,
+            is_active
+        } = req.body;
+
+        const updateData = {};
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (image_url !== undefined) updateData.image_url = image_url;
+        if (ingredients !== undefined) updateData.ingredients = ingredients;
+        if (products !== undefined) updateData.products = products;
+        if (instructions !== undefined) updateData.instructions = instructions;
+        if (is_active !== undefined) updateData.is_active = is_active;
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            updateData.image_url = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const recipeForOldImage = await Recipe.findById(req.params.id);
+            if (recipeForOldImage) {
+                const oldImage = recipeForOldImage.image_url;
+                if (oldImage && oldImage.includes('/uploads/')) {
+                    const oldFilename = oldImage.split('/uploads/')[1];
+                    const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                    if (fs.existsSync(oldFilePath)) {
+                        fs.unlinkSync(oldFilePath);
+                    }
+                }
+            }
+        }
+
+        const recipe = await Recipe.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
         if (!recipe) {
             return next(new ApiError(404, 'Recipe not found'));
         }

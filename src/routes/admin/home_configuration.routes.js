@@ -3,6 +3,15 @@ const router = express.Router();
 const homeConfigController = require('../../controllers/admin/home_configuration.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { homeConfigurationValidator, reorderValidator } = require('../../validators/home_configuration.validator');
+const upload = require('../../config/upload');
+
+const cpUpload = upload.fields([
+    { name: 'desktopImage', maxCount: 1 },
+    { name: 'mobileImage', maxCount: 1 },
+    { name: 'backgroundImage', maxCount: 1 },
+    { name: 'iconImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 }
+]);
 
 /**
  * @swagger
@@ -22,7 +31,7 @@ const { homeConfigurationValidator, reorderValidator } = require('../../validato
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -55,14 +64,19 @@ const { homeConfigurationValidator, reorderValidator } = require('../../validato
  *                 type: string
  *               desktopImage:
  *                 type: string
+ *                 format: binary
  *               mobileImage:
  *                 type: string
+ *                 format: binary
  *               backgroundImage:
  *                 type: string
+ *                 format: binary
  *               iconImage:
  *                 type: string
+ *                 format: binary
  *               bannerImage:
  *                 type: string
+ *                 format: binary
  *               primaryButtonText:
  *                 type: string
  *               primaryButtonUrl:
@@ -90,7 +104,7 @@ const { homeConfigurationValidator, reorderValidator } = require('../../validato
  *         description: Sections retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, homeConfigurationValidator, homeConfigController.createSection)
+    .post(authMiddleware.protectAdmin, cpUpload, homeConfigurationValidator, homeConfigController.createSection)
     .get(homeConfigController.getAllSections);
 
 /**
@@ -104,7 +118,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -153,7 +167,7 @@ router.route('/reorder')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -183,14 +197,19 @@ router.route('/reorder')
  *                 type: string
  *               desktopImage:
  *                 type: string
+ *                 format: binary
  *               mobileImage:
  *                 type: string
+ *                 format: binary
  *               backgroundImage:
  *                 type: string
+ *                 format: binary
  *               iconImage:
  *                 type: string
+ *                 format: binary
  *               bannerImage:
  *                 type: string
+ *                 format: binary
  *               primaryButtonText:
  *                 type: string
  *               primaryButtonUrl:
@@ -227,7 +246,7 @@ router.route('/reorder')
  */
 router.route('/:id')
     .get(homeConfigController.getSectionById)
-    .put(authMiddleware.protectAdmin, homeConfigurationValidator, homeConfigController.updateSection)
+    .put(authMiddleware.protectAdmin, cpUpload, homeConfigurationValidator, homeConfigController.updateSection)
     .delete(authMiddleware.protectAdmin, homeConfigController.deleteSection);
 
 /**

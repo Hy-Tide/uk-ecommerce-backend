@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 // Full product map including variants (supports both old and new fields for backward compatibility)
 const mapProductDetail = (prod) => ({
@@ -117,6 +119,19 @@ exports.createProduct = async (req, res, next) => {
             );
         }
 
+        let existingImages = [];
+        if (req.body.images) {
+            existingImages = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+        }
+        
+        if (req.files && req.files.length > 0) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const newImageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
+            req.body.images = [...existingImages, ...newImageUrls];
+        } else {
+            req.body.images = existingImages;
+        }
+
         const product = await Product.create(req.body);
         res.status(201).json(new ApiResponse(201, { product: mapProductDetail(product) }, 'Product created successfully'));
     } catch (error) {
@@ -222,6 +237,32 @@ exports.updateProduct = async (req, res, next) => {
                 },
                 { $inc: { displayOrder: 1 } }
             );
+        }
+
+        let existingImages = [];
+        if (req.body.images) {
+            existingImages = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+        }
+
+        if (req.files && req.files.length > 0) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const newImageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
+            req.body.images = [...existingImages, ...newImageUrls];
+        } else if (req.body.images !== undefined) {
+            req.body.images = existingImages;
+        }
+
+        if (req.body.images !== undefined && product.images) {
+            const imagesToDelete = product.images.filter(img => !req.body.images.includes(img));
+            imagesToDelete.forEach(oldImage => {
+                if (oldImage && oldImage.includes('/uploads/')) {
+                    const oldFilename = oldImage.split('/uploads/')[1];
+                    const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                    if (fs.existsSync(oldFilePath)) {
+                        fs.unlinkSync(oldFilePath);
+                    }
+                }
+            });
         }
 
         Object.assign(product, req.body);

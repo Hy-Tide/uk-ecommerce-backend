@@ -3,6 +3,7 @@ const router = express.Router();
 const bannerController = require('../../controllers/admin/banner.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { bannerValidator } = require('../../validators/banner.validator');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -22,17 +23,22 @@ const { bannerValidator } = require('../../validators/banner.validator');
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
+ *               - pageType
  *               - title
  *               - image_url
  *             properties:
+ *               pageType:
+ *                 type: string
+ *                 enum: [offers, blogs, recipes, contact-us]
  *               title:
  *                 type: string
  *               image_url:
  *                 type: string
+ *                 format: binary
  *               link:
  *                 type: string
  *               is_active:
@@ -60,12 +66,17 @@ const { bannerValidator } = require('../../validators/banner.validator');
  *         name: status
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: pageType
+ *         schema:
+ *           type: string
+ *           enum: [offers, blogs, recipes, contact-us]
  *     responses:
  *       200:
  *         description: Banners retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, bannerValidator, bannerController.createBanner)
+    .post(authMiddleware.protectAdmin, upload.single('image_url'), bannerValidator, bannerController.createBanner)
     .get(bannerController.getAllBanners);
 
 /**
@@ -97,14 +108,18 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
+ *               pageType:
+ *                 type: string
+ *                 enum: [offers, blogs, recipes, contact-us]
  *               title:
  *                 type: string
  *               image_url:
  *                 type: string
+ *                 format: binary
  *               link:
  *                 type: string
  *               is_active:
@@ -129,7 +144,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(bannerController.getBannerById)
-    .put(authMiddleware.protectAdmin, bannerValidator, bannerController.updateBanner)
+    .put(authMiddleware.protectAdmin, upload.single('image_url'), bannerValidator, bannerController.updateBanner)
     .delete(authMiddleware.protectAdmin, bannerController.deleteBanner);
 
 module.exports = router;

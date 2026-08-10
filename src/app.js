@@ -85,6 +85,7 @@ const websiteEnquiryRoutes = require('./routes/website/enquiry.routes');
 const websiteNotificationRoutes = require('./routes/website/notification.routes');
 const websiteSearchRoutes = require('./routes/website/search.routes');
 const websitePaymentRoutes = require('./routes/website/payment.routes');
+const websiteBannerRoutes = require('./routes/website/banner.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -112,6 +113,7 @@ const adminReportRoutes = require('./routes/admin/report.routes');
 const adminSettingRoutes = require('./routes/admin/setting.routes');
 const adminRoleRoutes = require('./routes/admin/role.routes');
 const adminAuditLogRoutes = require('./routes/admin/audit_log.routes');
+const adminBannerRoutes = require('./routes/admin/banner.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -144,6 +146,7 @@ app.use(`${API_PREFIX}/website/contact`, websiteEnquiryRoutes);
 app.use(`${API_PREFIX}/website/notifications`, websiteNotificationRoutes);
 app.use(`${API_PREFIX}/website/search`, websiteSearchRoutes);
 app.use(`${API_PREFIX}/website/payments`, websitePaymentRoutes);
+app.use(`${API_PREFIX}/website/banners`, websiteBannerRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);
@@ -171,6 +174,7 @@ app.use(`${API_PREFIX}/admin/reports`, adminReportRoutes);
 app.use(`${API_PREFIX}/admin/settings`, adminSettingRoutes);
 app.use(`${API_PREFIX}/admin/roles`, adminRoleRoutes);
 app.use(`${API_PREFIX}/admin/audit-logs`, adminAuditLogRoutes);
+app.use(`${API_PREFIX}/admin/banners`, adminBannerRoutes);
 
 // Root Route for Render Health Checks    
 app.get('/', (req, res) => {

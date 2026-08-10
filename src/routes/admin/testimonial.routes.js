@@ -3,6 +3,7 @@ const router = express.Router();
 const testimonialController = require('../../controllers/admin/testimonial.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { testimonialValidator } = require('../../validators/testimonial.validator');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -22,7 +23,7 @@ const { testimonialValidator } = require('../../validators/testimonial.validator
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -67,7 +68,7 @@ const { testimonialValidator } = require('../../validators/testimonial.validator
  *         description: Testimonials retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, testimonialValidator, testimonialController.createTestimonial)
+    .post(authMiddleware.protectAdmin, upload.single('image_url'), testimonialValidator, testimonialController.createTestimonial)
     .get(testimonialController.getAllTestimonials);
 
 /**
@@ -99,7 +100,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -133,7 +134,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(testimonialController.getTestimonialById)
-    .put(authMiddleware.protectAdmin, testimonialValidator, testimonialController.updateTestimonial)
+    .put(authMiddleware.protectAdmin, upload.single('image_url'), testimonialValidator, testimonialController.updateTestimonial)
     .delete(authMiddleware.protectAdmin, testimonialController.deleteTestimonial);
 
 module.exports = router;

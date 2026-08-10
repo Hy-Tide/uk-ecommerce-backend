@@ -3,6 +3,7 @@ const router = express.Router();
 const subCategoryController = require('../../controllers/admin/sub_category.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { subCategoryValidator } = require('../../validators/sub_category.validator');
+const upload = require('../../config/upload');
 
 
 
@@ -24,7 +25,7 @@ const { subCategoryValidator } = require('../../validators/sub_category.validato
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -77,7 +78,7 @@ const { subCategoryValidator } = require('../../validators/sub_category.validato
  *         description: SubCategories retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, subCategoryValidator, subCategoryController.createSubCategory)
+    .post(authMiddleware.protectAdmin, upload.single('image'), subCategoryValidator, subCategoryController.createSubCategory)
     .get(subCategoryController.getAllSubCategories);
 
 /**
@@ -109,7 +110,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -146,7 +147,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(subCategoryController.getSubCategoryById)
-    .put(authMiddleware.protectAdmin, subCategoryValidator, subCategoryController.updateSubCategory)
+    .put(authMiddleware.protectAdmin, upload.single('image'), subCategoryValidator, subCategoryController.updateSubCategory)
     .delete(authMiddleware.protectAdmin, subCategoryController.deleteSubCategory);
 
 module.exports = router;

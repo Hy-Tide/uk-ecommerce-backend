@@ -3,6 +3,7 @@ const router = express.Router();
 const recipeController = require('../../controllers/admin/recipe.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { recipeValidator } = require('../../validators/recipe.validator');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -22,7 +23,7 @@ const { recipeValidator } = require('../../validators/recipe.validator');
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -79,7 +80,7 @@ const { recipeValidator } = require('../../validators/recipe.validator');
  *         description: Recipes retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, recipeValidator, recipeController.createRecipe)
+    .post(authMiddleware.protectAdmin, upload.single('image_url'), recipeValidator, recipeController.createRecipe)
     .get(recipeController.getAllRecipes);
 
 /**
@@ -111,7 +112,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -153,7 +154,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(recipeController.getRecipeById)
-    .put(authMiddleware.protectAdmin, recipeValidator, recipeController.updateRecipe)
+    .put(authMiddleware.protectAdmin, upload.single('image_url'), recipeValidator, recipeController.updateRecipe)
     .delete(authMiddleware.protectAdmin, recipeController.deleteRecipe);
 
 /**
@@ -187,7 +188,7 @@ router.route('/:id')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -214,7 +215,7 @@ router.route('/:id')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:

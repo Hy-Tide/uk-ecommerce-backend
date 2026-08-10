@@ -2,6 +2,8 @@ const Brand = require('../../models/brand.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 const mapBrand = (brand) => ({
     _id: brand._id,
@@ -21,6 +23,11 @@ exports.createBrand = async (req, res, next) => {
         const existingBrand = await Brand.findOne({ name: req.body.name });
         if (existingBrand) {
             return next(new ApiError(409, 'Brand with this name already exists'));
+        }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
         const brand = await Brand.create(req.body);
@@ -86,6 +93,20 @@ exports.updateBrand = async (req, res, next) => {
         const brand = await Brand.findById(req.params.id);
         if (!brand) {
             return next(new ApiError(404, 'Brand not found'));
+        }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = brand.image_url;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
         }
 
         Object.assign(brand, req.body);

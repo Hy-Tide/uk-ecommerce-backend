@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const cuisineController = require('../../controllers/admin/cuisine.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -31,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -51,7 +52,7 @@ router.use(authMiddleware.protectAdmin);
  */
 router.route('/')
     .get(cuisineController.getAllCuisines)
-    .post(cuisineController.createCuisine);
+    .post(upload.single('image'), cuisineController.createCuisine);
 
 /**
  * @swagger
@@ -84,7 +85,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -116,7 +117,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(cuisineController.getCuisineById)
-    .put(cuisineController.updateCuisine)
+    .put(upload.single('image'), cuisineController.updateCuisine)
     .delete(cuisineController.deleteCuisine);
 
 module.exports = router;

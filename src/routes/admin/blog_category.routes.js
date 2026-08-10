@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const blogCategoryController = require('../../controllers/admin/blog_category.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const upload = require('../../config/upload');
 
 /**
  * @swagger
@@ -31,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -55,7 +56,7 @@ router.use(authMiddleware.protectAdmin);
  */
 router.route('/')
     .get(blogCategoryController.getAllBlogCategories)
-    .post(blogCategoryController.createBlogCategory);
+    .post(upload.single('image'), blogCategoryController.createBlogCategory);
 
 /**
  * @swagger
@@ -88,7 +89,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -124,7 +125,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(blogCategoryController.getBlogCategoryById)
-    .put(blogCategoryController.updateBlogCategory)
+    .put(upload.single('image'), blogCategoryController.updateBlogCategory)
     .delete(blogCategoryController.deleteBlogCategory);
 
 module.exports = router;

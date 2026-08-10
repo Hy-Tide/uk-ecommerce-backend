@@ -1,9 +1,15 @@
 const Cuisine = require('../../models/cuisine.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
+const fs = require('fs');
+const path = require('path');
 
 exports.createCuisine = async (req, res, next) => {
     try {
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image = `${baseUrl}/uploads/${req.file.filename}`;
+        }
         const cuisine = await Cuisine.create(req.body);
         res.status(201).json(new ApiResponse(201, { cuisine }, 'Cuisine created successfully'));
     } catch (error) {
@@ -58,10 +64,27 @@ exports.getCuisineById = async (req, res, next) => {
 
 exports.updateCuisine = async (req, res, next) => {
     try {
-        const cuisine = await Cuisine.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const cuisine = await Cuisine.findById(req.params.id);
         if (!cuisine) {
             return next(new ApiError(404, 'Cuisine not found'));
         }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = cuisine.image;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
+        }
+
+        Object.assign(cuisine, req.body);
+        await cuisine.save();
         res.status(200).json(new ApiResponse(200, { cuisine }, 'Cuisine updated successfully'));
     } catch (error) {
         if (error.code === 11000) {

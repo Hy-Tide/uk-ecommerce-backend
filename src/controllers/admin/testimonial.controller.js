@@ -2,12 +2,19 @@ const Testimonial = require('../../models/testimonial.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 exports.createTestimonial = async (req, res, next) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return next(new ApiError(400, 'Validation Error', errors.array()));
+        }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
         const testimonial = await Testimonial.create(req.body);
@@ -63,10 +70,29 @@ exports.updateTestimonial = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const testimonial = await Testimonial.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const testimonial = await Testimonial.findById(req.params.id);
         if (!testimonial) {
             return next(new ApiError(404, 'Testimonial not found'));
         }
+
+        if (req.file) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
+            
+            const oldImage = testimonial.image_url;
+            if (oldImage && oldImage.includes('/uploads/')) {
+                const oldFilename = oldImage.split('/uploads/')[1];
+                const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                }
+            }
+        }
+
+        Object.assign(testimonial, req.body);
+        await testimonial.save();
+
+
 
         res.status(200).json(new ApiResponse(200, { testimonial }, 'Testimonial updated successfully'));
     } catch (error) {

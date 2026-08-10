@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 exports.recipeValidator = [
     body('title').trim().notEmpty().withMessage('Recipe title is required'),
     body('description').trim().notEmpty().withMessage('Recipe description is required'),
-    body('image_url').optional().trim().isURL().withMessage('Please provide a valid URL for the image'),
+    body('image_url').optional().trim(),
     body('ingredients').optional().isArray().withMessage('Ingredients must be an array'),
     body('ingredients.*').isString().withMessage('Each ingredient must be a string'),
     body('products').optional().isArray().withMessage('Products must be an array'),

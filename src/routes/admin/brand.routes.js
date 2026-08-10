@@ -3,6 +3,7 @@ const router = express.Router();
 const brandController = require('../../controllers/admin/brand.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { brandValidator } = require('../../validators/brand.validator');
+const upload = require('../../config/upload');
 
 
 /**
@@ -23,7 +24,7 @@ const { brandValidator } = require('../../validators/brand.validator');
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -71,7 +72,7 @@ const { brandValidator } = require('../../validators/brand.validator');
  *         description: Brands retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, brandValidator, brandController.createBrand)
+    .post(authMiddleware.protectAdmin, upload.single('image_url'), brandValidator, brandController.createBrand)
     .get(brandController.getAllBrands);
 
 /**
@@ -106,7 +107,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -142,7 +143,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(brandController.getBrandById)
-    .put(authMiddleware.protectAdmin, brandValidator, brandController.updateBrand)
+    .put(authMiddleware.protectAdmin, upload.single('image_url'), brandValidator, brandController.updateBrand)
     .delete(authMiddleware.protectAdmin, brandController.deleteBrand);
 
 module.exports = router;

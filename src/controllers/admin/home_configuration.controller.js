@@ -2,12 +2,24 @@ const HomeConfiguration = require('../../models/home_configuration.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 exports.createSection = async (req, res, next) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return next(new ApiError(400, 'Validation Error', errors.array()));
+        }
+
+        if (req.files) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const fields = ['desktopImage', 'mobileImage', 'backgroundImage', 'iconImage', 'bannerImage'];
+            fields.forEach(field => {
+                if (req.files[field] && req.files[field].length > 0) {
+                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
+                }
+            });
         }
 
         const section = await HomeConfiguration.create(req.body);
@@ -52,10 +64,31 @@ exports.updateSection = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const section = await HomeConfiguration.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        if (!section) {
+        const sectionToUpdate = await HomeConfiguration.findById(req.params.id);
+        if (!sectionToUpdate) {
             return next(new ApiError(404, 'Section not found'));
         }
+
+        if (req.files) {
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const fields = ['desktopImage', 'mobileImage', 'backgroundImage', 'iconImage', 'bannerImage'];
+            fields.forEach(field => {
+                if (req.files[field] && req.files[field].length > 0) {
+                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
+                    
+                    const oldImage = sectionToUpdate[field];
+                    if (oldImage && oldImage.includes('/uploads/')) {
+                        const oldFilename = oldImage.split('/uploads/')[1];
+                        const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                        if (fs.existsSync(oldFilePath)) {
+                            fs.unlinkSync(oldFilePath);
+                        }
+                    }
+                }
+            });
+        }
+
+        const section = await HomeConfiguration.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
         res.status(200).json(new ApiResponse(200, { section }, 'Section updated successfully'));
     } catch (error) {
