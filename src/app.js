@@ -63,7 +63,7 @@ app.use(compression());
 
 // Serving static files
 app.use('/public', express.static(path.join(__dirname, '../public')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/upload', express.static(path.join(__dirname, '../upload')));
 
 // Import routes
 const websiteAuthRoutes = require('./routes/website/auth.routes');

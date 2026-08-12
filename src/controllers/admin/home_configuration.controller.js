@@ -14,10 +14,10 @@ exports.createSection = async (req, res, next) => {
 
         if (req.files) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const fields = ['desktopImage', 'mobileImage', 'backgroundImage', 'iconImage', 'bannerImage'];
+            const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
             fields.forEach(field => {
                 if (req.files[field] && req.files[field].length > 0) {
-                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
+                    req.body[field] = `${baseUrl}/upload/${req.files[field][0].filename}`;
                 }
             });
         }
@@ -71,15 +71,15 @@ exports.updateSection = async (req, res, next) => {
 
         if (req.files) {
             const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const fields = ['desktopImage', 'mobileImage', 'backgroundImage', 'iconImage', 'bannerImage'];
+            const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
             fields.forEach(field => {
                 if (req.files[field] && req.files[field].length > 0) {
-                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
+                    req.body[field] = `${baseUrl}/upload/${req.files[field][0].filename}`;
                     
                     const oldImage = sectionToUpdate[field];
-                    if (oldImage && oldImage.includes('/uploads/')) {
-                        const oldFilename = oldImage.split('/uploads/')[1];
-                        const oldFilePath = path.join(__dirname, '../../../uploads', oldFilename);
+                    if (oldImage && oldImage.includes('/upload/')) {
+                        const oldFilename = oldImage.split('/upload/')[1];
+                        const oldFilePath = path.join(__dirname, '../../../upload', oldFilename);
                         if (fs.existsSync(oldFilePath)) {
                             fs.unlinkSync(oldFilePath);
                         }

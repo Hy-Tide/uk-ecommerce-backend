@@ -21,8 +21,6 @@ const homeConfigurationSchema = new mongoose.Schema({
     },
     highlightTitle: { type: String, trim: true },
     description: { type: String, trim: true },
-    desktopImage: { type: String },
-    mobileImage: { type: String },
     backgroundImage: { type: String },
     iconImage: { type: String },
     bannerImage: { type: String },

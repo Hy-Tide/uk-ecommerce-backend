@@ -150,8 +150,6 @@ exports.resolveSectionData = async (section) => {
         highlightTitle: section.highlightTitle,
         subtitle: section.subtitle,
         description: section.description,
-        desktopImage: section.desktopImage,
-        mobileImage: section.mobileImage,
         backgroundImage: section.backgroundImage,
         iconImage: section.iconImage,
         bannerImage: section.bannerImage,

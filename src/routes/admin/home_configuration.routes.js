@@ -6,8 +6,6 @@ const { homeConfigurationValidator, reorderValidator } = require('../../validato
 const upload = require('../../config/upload');
 
 const cpUpload = upload.fields([
-    { name: 'desktopImage', maxCount: 1 },
-    { name: 'mobileImage', maxCount: 1 },
     { name: 'backgroundImage', maxCount: 1 },
     { name: 'iconImage', maxCount: 1 },
     { name: 'bannerImage', maxCount: 1 }
@@ -62,12 +60,6 @@ const cpUpload = upload.fields([
  *                 type: string
  *               description:
  *                 type: string
- *               desktopImage:
- *                 type: string
- *                 format: binary
- *               mobileImage:
- *                 type: string
- *                 format: binary
  *               backgroundImage:
  *                 type: string
  *                 format: binary
@@ -195,12 +187,6 @@ router.route('/reorder')
  *                 type: string
  *               description:
  *                 type: string
- *               desktopImage:
- *                 type: string
- *                 format: binary
- *               mobileImage:
- *                 type: string
- *                 format: binary
  *               backgroundImage:
  *                 type: string
  *                 format: binary

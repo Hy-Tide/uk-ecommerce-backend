@@ -25,8 +25,6 @@ exports.homeConfigurationValidator = [
     body('bannerIds').optional().isArray().withMessage('Banner IDs must be an array'),
     body('highlightTitle').optional().trim(),
     body('description').optional().trim(),
-    body('desktopImage').optional().trim(),
-    body('mobileImage').optional().trim(),
     body('backgroundImage').optional().trim(),
     body('iconImage').optional().trim(),
     body('bannerImage').optional().trim(),
