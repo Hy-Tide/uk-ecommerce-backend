@@ -44,7 +44,7 @@ exports.login = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role_id } = req.body;
 
         const existingUser = await AdminUser.findOne({ email });
         if (existingUser) {
@@ -62,7 +62,8 @@ exports.create = async (req, res, next) => {
             user: {
                 id: newUser._id,
                 name: newUser.name,
-                email: newUser.email
+                email: newUser.email,
+                role_id: newUser.role_id
             }
         }, 'Admin user created successfully'));
     } catch (error) {

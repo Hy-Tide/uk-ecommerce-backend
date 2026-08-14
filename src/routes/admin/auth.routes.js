@@ -61,6 +61,9 @@ router.post('/login', authController.login);
  *                 type: string
  *               password:
  *                 type: string
+ *               role_id:
+ *                 type: string
+ *                 description: ObjectId of the role
  *     responses:
  *       201:
  *         description: Admin user created successfully
