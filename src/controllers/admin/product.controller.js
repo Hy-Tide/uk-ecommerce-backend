@@ -6,6 +6,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { logStockChange } = require('../../utils/stockLogger');
 
 // Full product map including variants (supports both old and new fields for backward compatibility)
 const mapProductDetail = (prod) => ({
@@ -129,6 +130,26 @@ exports.createProduct = async (req, res, next) => {
         }
 
         const product = await Product.create(req.body);
+        
+        // Log stock addition for new products
+        if (product.variations && product.variations.length > 0) {
+            for (let v of product.variations) {
+                if (v.stockQuantity && v.stockQuantity > 0) {
+                    await logStockChange({
+                        productId: product._id,
+                        variationId: v._id,
+                        action: 'STOCK_ADDED',
+                        quantityChanged: v.stockQuantity,
+                        previousStock: 0,
+                        newStock: v.stockQuantity,
+                        reason: 'Initial Stock via Product Creation',
+                        user: req.user ? req.user._id : null,
+                        userModel: 'AdminUser'
+                    });
+                }
+            }
+        }
+
         res.status(201).json(new ApiResponse(201, { product: mapProductDetail(product) }, 'Product created successfully'));
     } catch (error) {
         if (error.code === 11000) {
@@ -261,8 +282,41 @@ exports.updateProduct = async (req, res, next) => {
             });
         }
 
+        const oldVariations = (product.variations || []).map(v => ({
+            id: v._id,
+            key: `${v.weight}-${v.weightUnit}`,
+            stock: v.stockQuantity || 0
+        }));
+
         Object.assign(product, req.body);
         await product.save();
+        
+        const newVariations = product.variations || [];
+        for (let newVar of newVariations) {
+            const key = `${newVar.weight}-${newVar.weightUnit}`;
+            const oldVar = oldVariations.find(ov => ov.key === key);
+            
+            const oldStock = oldVar ? oldVar.stock : 0;
+            const newStock = newVar.stockQuantity || 0;
+            
+            if (oldStock !== newStock) {
+                const quantityChanged = Math.abs(newStock - oldStock);
+                let finalAction = 'STOCK_ADJUSTED';
+                if (!oldVar) finalAction = 'STOCK_ADDED';
+                
+                await logStockChange({
+                    productId: product._id,
+                    variationId: newVar._id,
+                    action: finalAction,
+                    quantityChanged,
+                    previousStock: oldStock,
+                    newStock: newStock,
+                    reason: 'Admin Product Update',
+                    user: req.user ? req.user._id : null,
+                    userModel: 'AdminUser'
+                });
+            }
+        }
 
         res.status(200).json(new ApiResponse(200, { product: mapProductDetail(product) }, 'Product updated successfully'));
     } catch (error) {

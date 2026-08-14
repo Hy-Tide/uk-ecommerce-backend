@@ -12,7 +12,16 @@ exports.getOffers = async (req, res, next) => {
             endDate: { $gte: now }
         }).sort({ createdAt: -1 });
 
-        res.status(200).json(new ApiResponse(200, { offers }, 'Offers retrieved successfully'));
+        const OfferProduct = require('../../models/offer_product.model');
+        const offersWithCount = await Promise.all(offers.map(async (offer) => {
+            const productCount = await OfferProduct.countDocuments({ offerId: offer._id });
+            return {
+                ...offer.toObject(),
+                productCount
+            };
+        }));
+
+        res.status(200).json(new ApiResponse(200, { offers: offersWithCount }, 'Offers retrieved successfully'));
     } catch (error) {
         next(error);
     }

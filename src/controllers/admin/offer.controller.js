@@ -41,7 +41,7 @@ exports.getAllOffers = async (req, res, next) => {
 
         // Dynamically compute a 'computedStatus' for Admin viewing
         const now = new Date();
-        const mappedOffers = offers.map(offer => {
+        const mappedOffers = await Promise.all(offers.map(async (offer) => {
             let computedStatus = 'Upcoming';
             if (now > offer.endDate) {
                 computedStatus = 'Expired';
@@ -51,11 +51,15 @@ exports.getAllOffers = async (req, res, next) => {
             if (!offer.isActive) {
                 computedStatus = 'Inactive';
             }
+            
+            const productCount = await OfferProduct.countDocuments({ offerId: offer._id });
+            
             return {
                 ...offer.toObject(),
-                computedStatus
+                computedStatus,
+                productCount
             };
-        });
+        }));
 
         const total = await Offer.countDocuments(query);
 
@@ -74,7 +78,15 @@ exports.getOfferById = async (req, res, next) => {
         if (!offer) {
             return next(new ApiError(404, 'Offer not found'));
         }
-        res.status(200).json(new ApiResponse(200, { offer }, 'Offer retrieved successfully'));
+        const OfferProduct = require('../../models/offer_product.model');
+        const productCount = await OfferProduct.countDocuments({ offerId: offer._id });
+        
+        res.status(200).json(new ApiResponse(200, { 
+            offer: {
+                ...offer.toObject(),
+                productCount
+            }
+        }, 'Offer retrieved successfully'));
     } catch (error) {
         next(error);
     }

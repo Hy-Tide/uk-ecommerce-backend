@@ -4,6 +4,7 @@ const Coupon = require('../../models/coupon.model');
 const Order = require('../../models/order.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
+const { logStockChange } = require('../../utils/stockLogger');
 
 exports.validateCheckout = async (req, res, next) => {
     try {
@@ -98,9 +99,23 @@ exports.placeOrder = async (req, res, next) => {
                 return next(new ApiError(400, `Not enough stock for ${product.name}`));
             }
 
+            const previousStock = variation.stockQuantity;
+
             // Deduct stock
             variation.stockQuantity -= item.quantity;
             await product.save();
+            
+            await logStockChange({
+                productId: product._id,
+                variationId: variation._id,
+                action: 'STOCK_REMOVED',
+                quantityChanged: item.quantity,
+                previousStock,
+                newStock: variation.stockQuantity,
+                reason: 'Checkout Order',
+                user: req.user ? req.user._id : null,
+                userModel: 'User'
+            });
 
             orderItems.push({
                 product: product._id,

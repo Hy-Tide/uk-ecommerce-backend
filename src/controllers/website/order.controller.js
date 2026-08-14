@@ -3,6 +3,7 @@ const Cart = require('../../models/cart.model');
 const Product = require('../../models/product.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
+const { logStockChange } = require('../../utils/stockLogger');
 
 exports.getMyOrders = async (req, res, next) => {
     try {
@@ -49,8 +50,21 @@ exports.cancelOrder = async (req, res, next) => {
             if (product) {
                 const variation = product.variations.id(item.variationId);
                 if (variation) {
+                    const previousStock = variation.stockQuantity;
                     variation.stockQuantity += item.quantity;
                     await product.save();
+                    
+                    await logStockChange({
+                        productId: product._id,
+                        variationId: variation._id,
+                        action: 'STOCK_ADDED',
+                        quantityChanged: item.quantity,
+                        previousStock,
+                        newStock: variation.stockQuantity,
+                        reason: 'Order Cancelled',
+                        user: req.user ? req.user._id : null,
+                        userModel: 'User'
+                    });
                 }
             }
         }

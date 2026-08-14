@@ -1,4 +1,5 @@
 const Product = require('../../models/product.model');
+const StockLog = require('../../models/stock_log.model');
 const ApiResponse = require('../../utils/ApiResponse');
 
 exports.getInventory = async (req, res, next) => {
@@ -69,6 +70,89 @@ exports.getInventory = async (req, res, next) => {
             inventory: paginatedList,
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Inventory retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getCriticalStockAlerts = async (req, res, next) => {
+    try {
+        const { page = 1, limit = 10, status } = req.query;
+        let products = await Product.find().select('name sku variations');
+        
+        let alerts = [];
+        
+        products.forEach(p => {
+            (p.variations || []).forEach(v => {
+                const stock = v.stockQuantity || 0;
+                const minStockAlert = v.minStockAlert || 0;
+                
+                let currentStatus = null;
+                if (stock <= 0) {
+                    currentStatus = 'OUT_OF_STOCK';
+                } else if (stock > 0 && stock <= minStockAlert) {
+                    currentStatus = 'LOW_STOCK';
+                }
+                
+                if (currentStatus) {
+                    alerts.push({
+                        productId: p._id,
+                        variationId: v._id,
+                        productName: `${p.name} ${v.displayWeight ? '- ' + v.displayWeight : ''}`.trim(),
+                        sku: p.sku,
+                        stock,
+                        minStockAlert,
+                        status: currentStatus
+                    });
+                }
+            });
+        });
+        
+        if (status) {
+            alerts = alerts.filter(a => a.status === status);
+        }
+        
+        const skip = (page - 1) * limit;
+        const total = alerts.length;
+        const paginatedAlerts = alerts.slice(skip, skip + parseInt(limit));
+        
+        res.status(200).json(new ApiResponse(200, {
+            alerts: paginatedAlerts,
+            meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
+        }, 'Critical stock alerts retrieved successfully'));
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getStockManagementLogs = async (req, res, next) => {
+    try {
+        const { page = 1, limit = 10, product, action, user, startDate, endDate } = req.query;
+        
+        let query = {};
+        if (product) query.productId = product;
+        if (action) query.action = action;
+        if (user) query.user = user;
+        
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) query.createdAt.$gte = new Date(startDate);
+            if (endDate) query.createdAt.$lte = new Date(endDate);
+        }
+        
+        const skip = (page - 1) * limit;
+        const total = await StockLog.countDocuments(query);
+        const logs = await StockLog.find(query)
+            .populate('productId', 'name sku')
+            .populate('user', 'first_name last_name name email')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+            
+        res.status(200).json(new ApiResponse(200, {
+            logs,
+            meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
+        }, 'Stock management logs retrieved successfully'));
     } catch (error) {
         next(error);
     }
