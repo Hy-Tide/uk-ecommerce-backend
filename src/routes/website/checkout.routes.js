@@ -18,14 +18,44 @@ router.use(authMiddleware.protectWebsite);
  * /website/checkout/validate:
  *   post:
  *     summary: Validate cart for checkout
+ *     description: Validates the current user's cart (stock, coupon validity, etc.). No request payload is required as the cart is fetched using the user's authentication token.
  *     tags: [Website Checkout]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Checkout validated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     cart:
+ *                       type: object
  *       400:
  *         description: Validation failed (e.g. out of stock, invalid coupon, empty cart)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  */
 router.post('/validate', checkoutController.validateCheckout);
 

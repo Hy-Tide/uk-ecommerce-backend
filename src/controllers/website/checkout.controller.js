@@ -17,14 +17,19 @@ exports.validateCheckout = async (req, res, next) => {
         const errors = [];
 
         for (const item of cart.items) {
-            const product = await Product.findById(item.product._id);
+            if (!item.product) {
+                errors.push('A product in your cart is no longer available.');
+                continue;
+            }
+            
+            const product = await Product.findById(item.product._id || item.product);
             if (!product) {
-                errors.push(`Product ${item.product.name || item.product._id} not found.`);
+                errors.push(`Product ${item.product.name || item.product} not found.`);
                 continue;
             }
 
             if (product.variations && product.variations.length > 0) {
-                const variation = product.variations.id(item.variationId);
+                const variation = item.variationId ? product.variations.id(item.variationId) : null;
                 if (!variation) {
                     errors.push(`Variation for product ${product.name} not found.`);
                 } else if (variation.stockQuantity < item.quantity) {
@@ -65,9 +70,7 @@ exports.validateCheckout = async (req, res, next) => {
 exports.getPaymentMethods = async (req, res, next) => {
     try {
         const methods = [
-            { id: 'card', name: 'Credit / Debit Card' },
-            { id: 'paypal', name: 'PayPal' },
-            { id: 'cod', name: 'Cash on Delivery' }
+            { id: 'stripe', name: 'Credit / Debit Card (Stripe)' }
         ];
         res.status(200).json(new ApiResponse(200, { paymentMethods: methods }, 'Payment methods retrieved successfully'));
     } catch (error) {
