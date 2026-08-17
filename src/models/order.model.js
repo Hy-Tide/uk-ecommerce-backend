@@ -37,7 +37,14 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: { type: String, required: true },
     paymentStatus: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
     orderStatus: { type: String, enum: ['Pending', 'Confirmed', 'Preparing', 'Ready For Delivery', 'Delivered', 'Cancelled'], default: 'Pending' },
-    deliveryPersonId: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' }
+    deliveryPersonId: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' }, // legacy
+    
+    activeDeliveryAssignment: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryAssignment' },
+    deliveryStatus: {
+        type: String,
+        enum: ['NOT_ASSIGNED', 'ASSIGNED', 'ACCEPTED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED', 'CANCELLED'],
+        default: 'NOT_ASSIGNED'
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

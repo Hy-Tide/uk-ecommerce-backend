@@ -119,6 +119,8 @@ const adminAuditLogRoutes = require('./routes/admin/audit_log.routes');
 const adminBannerRoutes = require('./routes/admin/banner.routes');
 const adminNewsletterRoutes = require('./routes/admin/newsletter.routes');
 const adminDeliveryZoneRoutes = require('./routes/admin/delivery_zone.routes');
+const adminDeliveryPartnerRoutes = require('./routes/admin/delivery_partner.routes');
+const adminDeliveryAssignmentRoutes = require('./routes/admin/delivery_assignment.routes');
 const swaggerUi = require('swagger-ui-express');
 const { websiteSwaggerSpec, adminSwaggerSpec } = require('./config/swagger');
 
@@ -185,6 +187,8 @@ app.use(`${API_PREFIX}/admin/audit-logs`, adminAuditLogRoutes);
 app.use(`${API_PREFIX}/admin/banners`, adminBannerRoutes);
 app.use(`${API_PREFIX}/admin/newsletter`, adminNewsletterRoutes);
 app.use(`${API_PREFIX}/admin/delivery-zones`, adminDeliveryZoneRoutes);
+app.use(`${API_PREFIX}/admin/delivery-partners`, adminDeliveryPartnerRoutes);
+app.use(`${API_PREFIX}/admin/delivery-assignments`, adminDeliveryAssignmentRoutes);
 
 // Root Route for Render Health Checks    
 app.get('/', (req, res) => {

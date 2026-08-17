@@ -55,6 +55,9 @@ exports.getInventory = async (req, res, next) => {
             }
         }
 
+        // Generate critical alerts from the UNPAGINATED list (so alerts show for all matching items, not just current page)
+        const criticalAlerts = inventoryList.filter(item => item.status === 'Low Stock' || item.status === 'Out of Stock');
+
         // Sorting
         if (sort === 'stockAsc') inventoryList.sort((a, b) => a.stock - b.stock);
         else if (sort === 'stockDesc') inventoryList.sort((a, b) => b.stock - a.stock);
@@ -68,6 +71,7 @@ exports.getInventory = async (req, res, next) => {
 
         res.status(200).json(new ApiResponse(200, {
             inventory: paginatedList,
+            alerts: criticalAlerts,
             meta: { total, page: parseInt(page), limit: parseInt(limit), totalPages: Math.ceil(total / limit) }
         }, 'Inventory retrieved successfully'));
     } catch (error) {
