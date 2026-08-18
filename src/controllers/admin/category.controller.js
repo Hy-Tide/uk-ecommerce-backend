@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 const mapCategory = (cat) => ({
     _id: cat._id,
@@ -39,8 +40,10 @@ exports.createCategory = async (req, res, next) => {
 
         const data = handleBackwardCompatibility(req.body);
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        data.image = await processBase64Images(data.image, baseUrl);
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             data.image = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
@@ -124,6 +127,9 @@ exports.updateCategory = async (req, res, next) => {
 
         const data = handleBackwardCompatibility(req.body);
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        data.image = await processBase64Images(data.image, baseUrl);
+
         if (data.name) {
             const existingCategory = await Category.findOne({ name: data.name, _id: { $ne: req.params.id } });
             if (existingCategory) {
@@ -144,7 +150,6 @@ exports.updateCategory = async (req, res, next) => {
         }
 
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             data.image = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = category.image || category.image_url;

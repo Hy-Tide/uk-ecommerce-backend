@@ -5,11 +5,16 @@ const ApiResponse = require('../../utils/ApiResponse');
 const fs = require('fs');
 const path = require('path');
 const OfferProduct = require('../../models/offer_product.model');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createOffer = async (req, res, next) => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.bannerImage) {
+            req.body.bannerImage = await processBase64Images(req.body.bannerImage, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.bannerImage = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
@@ -99,8 +104,12 @@ exports.updateOffer = async (req, res, next) => {
             return next(new ApiError(404, 'Offer not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.bannerImage) {
+            req.body.bannerImage = await processBase64Images(req.body.bannerImage, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.bannerImage = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = offer.bannerImage;

@@ -3,11 +3,16 @@ const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createCuisine = async (req, res, next) => {
     try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image) {
+            req.body.image = await processBase64Images(req.body.image, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image = `${baseUrl}/uploads/${req.file.filename}`;
         }
         const cuisine = await Cuisine.create(req.body);
@@ -69,8 +74,12 @@ exports.updateCuisine = async (req, res, next) => {
             return next(new ApiError(404, 'Cuisine not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image) {
+            req.body.image = await processBase64Images(req.body.image, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = cuisine.image;

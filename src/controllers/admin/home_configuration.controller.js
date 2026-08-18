@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createSection = async (req, res, next) => {
     try {
@@ -12,12 +13,19 @@ exports.createSection = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
+        
+        for (const field of fields) {
+            if (req.body[field]) {
+                req.body[field] = await processBase64Images(req.body[field], baseUrl);
+            }
+        }
+
         if (req.files) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
             fields.forEach(field => {
                 if (req.files[field] && req.files[field].length > 0) {
-                    req.body[field] = `${baseUrl}/upload/${req.files[field][0].filename}`;
+                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
                 }
             });
         }
@@ -69,17 +77,25 @@ exports.updateSection = async (req, res, next) => {
             return next(new ApiError(404, 'Section not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
+        
+        for (const field of fields) {
+            if (req.body[field]) {
+                req.body[field] = await processBase64Images(req.body[field], baseUrl);
+            }
+        }
+
         if (req.files) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
             fields.forEach(field => {
                 if (req.files[field] && req.files[field].length > 0) {
-                    req.body[field] = `${baseUrl}/upload/${req.files[field][0].filename}`;
+                    req.body[field] = `${baseUrl}/uploads/${req.files[field][0].filename}`;
                     
                     const oldImage = sectionToUpdate[field];
-                    if (oldImage && oldImage.includes('/upload/')) {
-                        const oldFilename = oldImage.split('/upload/')[1];
-                        const oldFilePath = path.join(__dirname, '../../../upload', oldFilename);
+                    if (oldImage && (oldImage.includes('/upload/') || oldImage.includes('/uploads/'))) {
+                        const oldDir = oldImage.includes('/upload/') ? 'upload' : 'uploads';
+                        const oldFilename = oldImage.split(`/${oldDir}/`)[1];
+                        const oldFilePath = path.join(__dirname, `../../../${oldDir}`, oldFilename);
                         if (fs.existsSync(oldFilePath)) {
                             fs.unlinkSync(oldFilePath);
                         }

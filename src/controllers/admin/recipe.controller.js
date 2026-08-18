@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createRecipe = async (req, res, next) => {
     try {
@@ -21,9 +22,13 @@ exports.createRecipe = async (req, res, next) => {
             is_active
         } = req.body;
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
         let image_url = req.body.image_url;
+        if (image_url) {
+            image_url = await processBase64Images(image_url, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             image_url = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
@@ -106,14 +111,17 @@ exports.updateRecipe = async (req, res, next) => {
         const updateData = {};
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
-        if (image_url !== undefined) updateData.image_url = image_url;
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        
+        if (image_url !== undefined) {
+            updateData.image_url = await processBase64Images(image_url, baseUrl);
+        }
         if (ingredients !== undefined) updateData.ingredients = ingredients;
         if (products !== undefined) updateData.products = products;
         if (instructions !== undefined) updateData.instructions = instructions;
         if (is_active !== undefined) updateData.is_active = is_active;
 
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             updateData.image_url = `${baseUrl}/uploads/${req.file.filename}`;
             
             const recipeForOldImage = await Recipe.findById(req.params.id);

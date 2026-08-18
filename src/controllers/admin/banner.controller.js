@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createBanner = async (req, res, next) => {
     try {
@@ -12,8 +13,12 @@ exports.createBanner = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image_url) {
+            req.body.image_url = await processBase64Images(req.body.image_url, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
@@ -79,8 +84,12 @@ exports.updateBanner = async (req, res, next) => {
             return next(new ApiError(404, 'Banner not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image_url) {
+            req.body.image_url = await processBase64Images(req.body.image_url, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = banner.image_url;

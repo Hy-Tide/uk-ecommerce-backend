@@ -4,6 +4,7 @@ const DeliveryHistory = require('../../models/delivery_history.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createPartner = async (req, res, next) => {
     try {
@@ -15,6 +16,11 @@ exports.createPartner = async (req, res, next) => {
         const data = { ...req.body };
         data.createdBy = req.user._id;
         data.updatedBy = req.user._id;
+
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (data.profileImage) {
+            data.profileImage = await processBase64Images(data.profileImage, baseUrl);
+        }
 
         const partner = await DeliveryPartner.create(data);
         res.status(201).json(new ApiResponse(201, { partner }, 'Delivery partner created successfully'));
@@ -85,6 +91,11 @@ exports.updatePartner = async (req, res, next) => {
 
         const data = { ...req.body };
         data.updatedBy = req.user._id;
+
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (data.profileImage) {
+            data.profileImage = await processBase64Images(data.profileImage, baseUrl);
+        }
 
         Object.assign(partner, data);
         await partner.save();

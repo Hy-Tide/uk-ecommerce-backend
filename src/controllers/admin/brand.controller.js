@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 const mapBrand = (brand) => ({
     _id: brand._id,
@@ -20,13 +21,19 @@ exports.createBrand = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const existingBrand = await Brand.findOne({ name: req.body.name });
-        if (existingBrand) {
-            return next(new ApiError(409, 'Brand with this name already exists'));
+        if (req.body.name) {
+            const existingBrand = await Brand.findOne({ name: req.body.name });
+            if (existingBrand) {
+                return next(new ApiError(409, 'Brand with this name already exists'));
+            }
+        }
+
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image_url) {
+            req.body.image_url = await processBase64Images(req.body.image_url, baseUrl);
         }
 
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
@@ -95,8 +102,12 @@ exports.updateBrand = async (req, res, next) => {
             return next(new ApiError(404, 'Brand not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.image_url) {
+            req.body.image_url = await processBase64Images(req.body.image_url, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.image_url = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = brand.image_url;

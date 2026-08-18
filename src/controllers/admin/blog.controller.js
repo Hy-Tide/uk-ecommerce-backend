@@ -3,6 +3,7 @@ const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 exports.createBlog = async (req, res, next) => {
     try {
@@ -16,11 +17,15 @@ exports.createBlog = async (req, res, next) => {
             return next(new ApiError(400, 'Blog category is required'));
         }
 
-        if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
-            req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.featuredImage) {
+            req.body.featuredImage = await processBase64Images(req.body.featuredImage, baseUrl);
         } else if (req.body.coverImage) {
-            req.body.featuredImage = req.body.coverImage;
+            req.body.featuredImage = await processBase64Images(req.body.coverImage, baseUrl);
+        }
+
+        if (req.file) {
+            req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
         }
 
         const blog = await Blog.create(req.body);
@@ -105,8 +110,14 @@ exports.updateBlog = async (req, res, next) => {
             return next(new ApiError(404, 'Blog not found'));
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (req.body.featuredImage) {
+            req.body.featuredImage = await processBase64Images(req.body.featuredImage, baseUrl);
+        } else if (req.body.coverImage) {
+            req.body.featuredImage = await processBase64Images(req.body.coverImage, baseUrl);
+        }
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             req.body.featuredImage = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = existingBlog.featuredImage;
@@ -117,8 +128,6 @@ exports.updateBlog = async (req, res, next) => {
                     fs.unlinkSync(oldFilePath);
                 }
             }
-        } else if (req.body.coverImage) {
-            req.body.featuredImage = req.body.coverImage;
         }
 
         const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });

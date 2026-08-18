@@ -4,6 +4,7 @@ const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 const mapSubCategory = (sub) => ({
     _id: sub._id,
@@ -42,8 +43,10 @@ exports.createSubCategory = async (req, res, next) => {
 
         const data = handleBackwardCompatibility(req.body);
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        data.image = await processBase64Images(data.image, baseUrl);
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             data.image = `${baseUrl}/uploads/${req.file.filename}`;
         }
         if (data.displayOrder !== undefined) {
@@ -109,8 +112,10 @@ exports.updateSubCategory = async (req, res, next) => {
 
         const data = handleBackwardCompatibility(req.body);
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        data.image = await processBase64Images(data.image, baseUrl);
+
         if (req.file) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             data.image = `${baseUrl}/uploads/${req.file.filename}`;
             
             const oldImage = subCategory.image || subCategory.image_url;

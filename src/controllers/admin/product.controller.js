@@ -7,6 +7,7 @@ const { validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
 const { logStockChange } = require('../../utils/stockLogger');
+const { processBase64Images } = require('../../utils/base64Helper');
 
 // Full product map including variants (supports both old and new fields for backward compatibility)
 const mapProductDetail = (prod) => ({
@@ -121,8 +122,10 @@ exports.createProduct = async (req, res, next) => {
             existingImages = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
         }
         
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        existingImages = await processBase64Images(existingImages, baseUrl);
+
         if (req.files && req.files.length > 0) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             const newImageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
             req.body.images = [...existingImages, ...newImageUrls];
         } else {
@@ -261,8 +264,10 @@ exports.updateProduct = async (req, res, next) => {
             existingImages = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
         }
 
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        existingImages = await processBase64Images(existingImages, baseUrl);
+
         if (req.files && req.files.length > 0) {
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
             const newImageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
             req.body.images = [...existingImages, ...newImageUrls];
         } else if (req.body.images !== undefined) {
