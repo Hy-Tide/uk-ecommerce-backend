@@ -61,10 +61,17 @@ app.use(cookieParser());
 // Compression
 app.use(compression());
 
+// Ensure uploads directory exists
+const fs = require('fs');
+const uploadsPath = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
 // Serving static files
 app.use('/public', express.static(path.join(__dirname, '../public')));
-app.use('/upload', express.static(path.join(__dirname, '../upload')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/upload', express.static(uploadsPath)); // Backward compatibility for old DB records
+app.use('/uploads', express.static(uploadsPath));
 
 // Import routes
 const websiteAuthRoutes = require('./routes/website/auth.routes');
