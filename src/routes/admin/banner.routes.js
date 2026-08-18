@@ -23,7 +23,7 @@ const upload = require('../../config/upload');
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -38,7 +38,7 @@ const upload = require('../../config/upload');
  *                 type: string
  *               image_url:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               link:
  *                 type: string
  *               description:
@@ -110,7 +110,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -121,7 +121,7 @@ router.route('/')
  *                 type: string
  *               image_url:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               link:
  *                 type: string
  *               description:

@@ -32,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -44,7 +44,7 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               bannerImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               startDate:
  *                 type: string
  *                 format: date-time
@@ -95,7 +95,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -105,7 +105,7 @@ router.route('/')
  *                 type: string
  *               bannerImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               startDate:
  *                 type: string
  *                 format: date-time

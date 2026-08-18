@@ -32,7 +32,7 @@ router.use(authMiddleware.protectAdmin);
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -54,7 +54,7 @@ router.use(authMiddleware.protectAdmin);
  *                 type: string
  *               featuredImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               tags:
  *                 type: array
  *                 items:
@@ -108,7 +108,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -126,7 +126,7 @@ router.route('/')
  *                 type: string
  *               featuredImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               tags:
  *                 type: array
  *                 items:

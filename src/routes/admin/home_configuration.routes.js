@@ -29,7 +29,7 @@ const cpUpload = upload.fields([
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -62,13 +62,13 @@ const cpUpload = upload.fields([
  *                 type: string
  *               backgroundImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               iconImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               bannerImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               primaryButtonText:
  *                 type: string
  *               primaryButtonUrl:
@@ -110,7 +110,7 @@ router.route('/')
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -159,7 +159,7 @@ router.route('/reorder')
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -189,13 +189,13 @@ router.route('/reorder')
  *                 type: string
  *               backgroundImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               iconImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               bannerImage:
  *                 type: string
- *                 format: binary
+ *                 description: Base64 encoded string
  *               primaryButtonText:
  *                 type: string
  *               primaryButtonUrl:
