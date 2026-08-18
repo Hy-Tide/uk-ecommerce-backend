@@ -16,7 +16,6 @@ async function runTest() {
         
         if (fs.existsSync(filepath)) {
             console.log('File successfully created at:', filepath);
-            fs.unlinkSync(filepath); // clean up
             console.log('Test passed.');
         } else {
             console.error('File not found at:', filepath);

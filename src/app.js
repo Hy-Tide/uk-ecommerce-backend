@@ -21,10 +21,22 @@ const app = express();
 app.use(helmet());
 
 // Cross-Origin Resource Sharing
+const allowedOrigins = [
+    'https://grandmasbasket.co.uk',
+    'https://www.grandmasbasket.co.uk',
+    process.env.CLIENT_URL,
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:5173'
+].filter(Boolean);
+
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow all origins
-        callback(null, true);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
     },
     credentials: true
 }));
@@ -69,9 +81,15 @@ if (!fs.existsSync(uploadsPath)) {
 }
 
 // Serving static files
-app.use('/public', express.static(path.join(__dirname, '../public')));
-app.use('/upload', express.static(uploadsPath)); // Backward compatibility for old DB records
-app.use('/uploads', express.static(uploadsPath));
+const staticOptions = {
+    setHeaders: (res, path, stat) => {
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+};
+
+app.use('/public', express.static(path.join(__dirname, '../public'), staticOptions));
+app.use('/upload', express.static(uploadsPath, staticOptions)); // Backward compatibility for old DB records
+app.use('/uploads', express.static(uploadsPath, staticOptions));
 
 // Import routes
 const websiteAuthRoutes = require('./routes/website/auth.routes');
