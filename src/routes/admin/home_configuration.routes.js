@@ -13,6 +13,23 @@ const cpUpload = upload.fields([
     { name: 'mobileImage', maxCount: 1 }
 ]);
 
+const parseJsonFields = (req, res, next) => {
+    const jsonFields = [
+        'selectedProductIds', 'categoryIds', 'subCategoryIds', 'brandIds', 
+        'recipeIds', 'testimonialIds', 'bannerIds', 'items', 'filters', 'settings'
+    ];
+    jsonFields.forEach(field => {
+        if (req.body[field] && typeof req.body[field] === 'string') {
+            try {
+                req.body[field] = JSON.parse(req.body[field]);
+            } catch (e) {
+                // Let validator handle invalid JSON
+            }
+        }
+    });
+    next();
+};
+
 /**
  * @swagger
  * tags:
@@ -98,7 +115,7 @@ const cpUpload = upload.fields([
  *         description: Sections retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, cpUpload, homeConfigurationValidator, homeConfigController.createSection)
+    .post(authMiddleware.protectAdmin, cpUpload, parseJsonFields, homeConfigurationValidator, homeConfigController.createSection)
     .get(homeConfigController.getAllSections);
 
 /**
@@ -234,7 +251,7 @@ router.route('/reorder')
  */
 router.route('/:id')
     .get(homeConfigController.getSectionById)
-    .put(authMiddleware.protectAdmin, cpUpload, homeConfigurationValidator, homeConfigController.updateSection)
+    .put(authMiddleware.protectAdmin, cpUpload, parseJsonFields, homeConfigurationValidator, homeConfigController.updateSection)
     .delete(authMiddleware.protectAdmin, homeConfigController.deleteSection);
 
 /**

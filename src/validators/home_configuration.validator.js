@@ -4,7 +4,7 @@ exports.homeConfigurationValidator = [
     body('sectionType').trim().notEmpty().withMessage('Section type is required').isIn([
         'Hero Banner', 'Service Features', 'Offer Banners', 'Shop by Categories',
         'Today\'s Best Deals', 'Limited Products', 'Recommended Products', 'New Arrivals',
-        'Recently Viewed', 'Subscription Banner', 'Shop by Brands', 'Popular Recipes', 
+        'Recently Viewed', 'Subscription Banner', 'Shop by Brands', 'Popular Recipes',
         'Testimonials', 'Why Choose Us', 'Newsletter'
     ]).withMessage('Invalid section type'),
     body('title').optional().trim(),
@@ -29,6 +29,8 @@ exports.homeConfigurationValidator = [
     body('iconImage').optional().trim(),
     body('bannerImage').optional().trim(),
     body('image').optional().trim(),
+    body('desktopImage').optional().trim(),
+    body('mobileImage').optional().trim(),
     body('primaryButtonText').optional().trim(),
     body('primaryButtonUrl').optional().trim(),
     body('secondaryButtonText').optional().trim(),
