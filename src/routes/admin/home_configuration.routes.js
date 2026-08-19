@@ -8,7 +8,9 @@ const upload = require('../../config/upload');
 const cpUpload = upload.fields([
     { name: 'backgroundImage', maxCount: 1 },
     { name: 'iconImage', maxCount: 1 },
-    { name: 'bannerImage', maxCount: 1 }
+    { name: 'bannerImage', maxCount: 1 },
+    { name: 'desktopImage', maxCount: 1 },
+    { name: 'mobileImage', maxCount: 1 }
 ]);
 
 /**

@@ -25,6 +25,8 @@ const homeConfigurationSchema = new mongoose.Schema({
     iconImage: { type: String },
     bannerImage: { type: String },
     image: { type: String },
+    desktopImage: { type: String },
+    mobileImage: { type: String },
     primaryButtonText: { type: String, trim: true },
     primaryButtonUrl: { type: String, trim: true },
     secondaryButtonText: { type: String, trim: true },

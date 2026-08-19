@@ -14,7 +14,7 @@ exports.createSection = async (req, res, next) => {
         }
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
+        const fields = ['backgroundImage', 'iconImage', 'bannerImage', 'desktopImage', 'mobileImage'];
         
         for (const field of fields) {
             if (req.body[field]) {
@@ -78,7 +78,7 @@ exports.updateSection = async (req, res, next) => {
         }
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const fields = ['backgroundImage', 'iconImage', 'bannerImage'];
+        const fields = ['backgroundImage', 'iconImage', 'bannerImage', 'desktopImage', 'mobileImage'];
         
         for (const field of fields) {
             if (req.body[field]) {
