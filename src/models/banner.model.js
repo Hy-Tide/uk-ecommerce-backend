@@ -12,7 +12,7 @@ const bannerSchema = new mongoose.Schema({
     },
     pageType: {
         type: String,
-        enum: ['home', 'offers', 'blogs', 'recipes', 'contact-us'],
+        enum: ['offers', 'blogs', 'recipes', 'contact-us'],
         required: [true, 'Page type is required']
     },
     link: {

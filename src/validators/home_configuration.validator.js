@@ -28,6 +28,7 @@ exports.homeConfigurationValidator = [
     body('backgroundImage').optional().trim(),
     body('iconImage').optional().trim(),
     body('bannerImage').optional().trim(),
+    body('image').optional().trim(),
     body('primaryButtonText').optional().trim(),
     body('primaryButtonUrl').optional().trim(),
     body('secondaryButtonText').optional().trim(),
