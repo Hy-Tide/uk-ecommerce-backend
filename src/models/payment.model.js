@@ -4,7 +4,7 @@ const paymentSchema = new mongoose.Schema({
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
-        required: true
+        required: false // Optional initially, set after successful payment
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +40,10 @@ const paymentSchema = new mongoose.Schema({
     },
     refundDate: {
         type: Date
+    },
+    checkoutData: {
+        type: mongoose.Schema.Types.Mixed,
+        description: 'Snapshot of the cart and checkout details for webhook order creation'
     }
 }, { timestamps: true });
 

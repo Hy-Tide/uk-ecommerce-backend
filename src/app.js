@@ -22,6 +22,8 @@ app.use(helmet());
 
 // Cross-Origin Resource Sharing
 const allowedOrigins = [
+    'https://uk-ecommerce-admin.hytide.in',
+    'https://uk-ecommerce.hytide.in',
     'https://grandmasbasket.co.uk',
     'https://www.grandmasbasket.co.uk',
     process.env.CLIENT_URL,
@@ -115,6 +117,7 @@ const websiteBannerRoutes = require('./routes/website/banner.routes');
 const websiteNewsletterRoutes = require('./routes/website/newsletter.routes');
 const websiteSettingRoutes = require('./routes/website/setting.routes');
 const websiteDeliveryRoutes = require('./routes/website/delivery.routes');
+const websiteNavigationRoutes = require('./routes/website/navigation.routes');
 
 const adminAuthRoutes = require('./routes/admin/auth.routes');
 const adminCategoryRoutes = require('./routes/admin/category.routes');
@@ -183,6 +186,7 @@ app.use(`${API_PREFIX}/website/banners`, websiteBannerRoutes);
 app.use(`${API_PREFIX}/website/newsletter`, websiteNewsletterRoutes);
 app.use(`${API_PREFIX}/website/settings`, websiteSettingRoutes);
 app.use(`${API_PREFIX}/website/delivery`, websiteDeliveryRoutes);
+app.use(`${API_PREFIX}/website/navigation`, websiteNavigationRoutes);
 
 app.use(`${API_PREFIX}/admin/auth`, adminAuthRoutes);
 app.use(`${API_PREFIX}/admin/categories`, adminCategoryRoutes);

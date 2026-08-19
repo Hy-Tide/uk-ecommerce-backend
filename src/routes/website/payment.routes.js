@@ -43,11 +43,11 @@ router.use(authMiddleware.protectWebsite);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - orderId
  *             properties:
- *               orderId:
- *                 type: string
+ *               shippingAddress:
+ *                 type: object
+ *               billingAddress:
+ *                 type: object
  *     responses:
  *       200:
  *         description: Payment intent created successfully
@@ -73,5 +73,30 @@ router.post('/create-payment-intent', paymentController.createPaymentIntent);
  *         description: Payment status retrieved successfully
  */
 router.get('/:orderId', paymentController.getPaymentStatus);
+
+/**
+ * @swagger
+ * /website/payments/verify:
+ *   post:
+ *     summary: Verify payment intent and create order
+ *     tags: [Website Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - paymentIntentId
+ *             properties:
+ *               paymentIntentId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Payment verified and order created
+ */
+router.post('/verify', paymentController.verifyPaymentAndOrder);
 
 module.exports = router;
