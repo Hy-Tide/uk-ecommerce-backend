@@ -153,4 +153,16 @@ router.get('/testimonials', homeController.getTestimonials);
  */
 router.get('/why-choose-us', homeController.getWhyChooseUs);
 
+/**
+ * @swagger
+ * /website/home/offers:
+ *   get:
+ *     summary: Get Offer Banners section
+ *     tags: [Website Home]
+ *     responses:
+ *       200:
+ *         description: Offers retrieved successfully
+ */
+router.get('/offers', homeController.getOffers);
+
 module.exports = router;

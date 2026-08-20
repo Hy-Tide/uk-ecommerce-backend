@@ -96,6 +96,7 @@ exports.getNewArrivals = (req, res, next) => getSectionByType('New Arrivals', re
 exports.getPopularRecipes = (req, res, next) => getSectionByType('Popular Recipes', req, res, next);
 exports.getTestimonials = (req, res, next) => getSectionByType('Testimonials', req, res, next);
 exports.getWhyChooseUs = (req, res, next) => getSectionByType('Why Choose Us', req, res, next);
+exports.getOffers = (req, res, next) => getSectionByType('Offer Banners', req, res, next);
 
 exports.getHomepage = async (req, res, next) => {
     try {
@@ -115,6 +116,7 @@ exports.getHomepage = async (req, res, next) => {
             popularRecipes: [],
             testimonials: [],
             whyChooseUs: [],
+            offers: [],
             settings: {} // This should ideally be fetched from Setting model, but we will leave empty here as per structure or fetch it
         };
 
@@ -149,6 +151,7 @@ exports.getHomepage = async (req, res, next) => {
             else if (section.sectionType === 'Popular Recipes') responseData.popularRecipes = section;
             else if (section.sectionType === 'Testimonials') responseData.testimonials = section;
             else if (section.sectionType === 'Why Choose Us') responseData.whyChooseUs = section;
+            else if (section.sectionType === 'Offer Banners') responseData.offers = section;
         });
 
         res.status(200).json(new ApiResponse(200, responseData, 'Homepage retrieved successfully'));
