@@ -28,22 +28,22 @@ exports.resolveSectionData = async (section) => {
         return queryObj;
     };
 
-    if (section.dataSource === 'Manual') {
+    if (['Manual', 'manual', 'Manual Selection'].includes(section.dataSource)) {
         // Fetch manually selected IDs based on section type
         switch (section.sectionType) {
-            case 'Categories':
+            case 'Shop by Categories':
                 if (section.categoryIds && section.categoryIds.length > 0) {
-                    data = await Category.find({ _id: { $in: section.categoryIds }, is_active: true });
+                    data = await Category.find({ _id: { $in: section.categoryIds }, status: 'Active' }).select('-description');
                 }
                 break;
-            case 'Brands':
+            case 'Shop by Brands':
                 if (section.brandIds && section.brandIds.length > 0) {
-                    data = await Brand.find({ _id: { $in: section.brandIds }, is_active: true });
+                    data = await Brand.find({ _id: { $in: section.brandIds }, is_active: true }).select('-description');
                 }
                 break;
-            case 'Recipes':
+            case 'Popular Recipes':
                 if (section.recipeIds && section.recipeIds.length > 0) {
-                    data = await Recipe.find({ _id: { $in: section.recipeIds }, is_active: true });
+                    data = await Recipe.find({ _id: { $in: section.recipeIds }, is_active: true }).select('-description -instructions');
                 }
                 break;
             case 'Testimonials':
@@ -54,23 +54,23 @@ exports.resolveSectionData = async (section) => {
             case 'Hero Banner':
             case 'Promotional Banner Grid':
                 if (section.bannerIds && section.bannerIds.length > 0) {
-                    data = await Banner.find({ _id: { $in: section.bannerIds }, is_active: true });
+                    data = await Banner.find({ _id: { $in: section.bannerIds }, is_active: true }).select('-description');
                 }
                 break;
             default:
                 // For all product-based sections (Best Deals, Limited Products, etc.)
                 if (section.selectedProductIds && section.selectedProductIds.length > 0) {
-                    data = await Product.find({ _id: { $in: section.selectedProductIds }, isActive: true })
+                    data = await Product.find({ _id: { $in: section.selectedProductIds }, status: 'active' })
                         .select('name slug images price variations inStock isFeatured');
                 }
                 break;
         }
     } else {
         // Automatic data sourcing
-        let queryObj = { isActive: true }; // Assumes isActive is standard for products
+        let queryObj = { status: 'active' }; // Assumes status active is standard for products
         
         switch (section.sectionType) {
-            case 'Best Deals':
+            case "Today's Best Deals":
                 queryObj = applyProductFilters(queryObj);
                 // In a real app, you might sort by discount percentage calculated via aggregation
                 data = await Product.find(queryObj)
@@ -117,16 +117,16 @@ exports.resolveSectionData = async (section) => {
                     .select('name slug images price variations inStock');
                 break;
                 
-            case 'Categories':
-                data = await Category.find({ is_active: true }).limit(section.productLimit || 10);
+            case 'Shop by Categories':
+                data = await Category.find({ status: 'Active' }).select('-description').limit(section.productLimit || 10);
                 break;
                 
-            case 'Brands':
-                data = await Brand.find({ is_active: true }).limit(section.productLimit || 10);
+            case 'Shop by Brands':
+                data = await Brand.find({ is_active: true }).select('-description').limit(section.productLimit || 10);
                 break;
                 
-            case 'Recipes':
-                data = await Recipe.find({ is_active: true }).sort('-createdAt').limit(section.productLimit || 4);
+            case 'Popular Recipes':
+                data = await Recipe.find({ is_active: true }).sort('-createdAt').select('-description -instructions').limit(section.productLimit || 4);
                 break;
 
             case 'Testimonials':
@@ -135,7 +135,7 @@ exports.resolveSectionData = async (section) => {
 
             case 'Hero Banner':
             case 'Promotional Banner Grid':
-                data = await Banner.find({ is_active: true }).sort('-createdAt').limit(section.productLimit || 3);
+                data = await Banner.find({ is_active: true }).sort('-createdAt').select('-description').limit(section.productLimit || 3);
                 break;
                 
             default:
