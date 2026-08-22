@@ -13,6 +13,13 @@ exports.createBanner = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
+        if (req.body.pageType) {
+            const existingBanner = await Banner.findOne({ pageType: req.body.pageType });
+            if (existingBanner) {
+                return next(new ApiError(400, `A banner already exists for the ${req.body.pageType} page. Only one banner is allowed.`));
+            }
+        }
+
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         if (req.body.image_url) {
             req.body.image_url = await processBase64Images(req.body.image_url, baseUrl);
@@ -82,6 +89,13 @@ exports.updateBanner = async (req, res, next) => {
         const banner = await Banner.findById(req.params.id);
         if (!banner) {
             return next(new ApiError(404, 'Banner not found'));
+        }
+
+        if (req.body.pageType && req.body.pageType !== banner.pageType) {
+            const existingBanner = await Banner.findOne({ pageType: req.body.pageType });
+            if (existingBanner) {
+                return next(new ApiError(400, `A banner already exists for the ${req.body.pageType} page. Only one banner is allowed.`));
+            }
         }
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;

@@ -48,6 +48,8 @@ const upload = require('../../config/upload');
  *     responses:
  *       201:
  *         description: Banner created successfully
+ *       400:
+ *         description: Validation error or a banner already exists for this page type
  *   get:
  *     summary: Get all banners
  *     tags: [Admin Banners]
@@ -131,6 +133,10 @@ router.route('/')
  *     responses:
  *       200:
  *         description: Banner updated successfully
+ *       400:
+ *         description: Validation error or a banner already exists for this page type
+ *       404:
+ *         description: Banner not found
  *   delete:
  *     summary: Delete a banner by ID
  *     tags: [Admin Banners]
