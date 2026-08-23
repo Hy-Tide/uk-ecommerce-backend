@@ -37,8 +37,15 @@ exports.getOfferProducts = async (req, res, next) => {
             isActive: true,
             startDate: { $lte: now },
             endDate: { $gte: now }
-        }).populate({
-            path: 'products',
+        });
+
+        if (!offer) {
+            return next(new ApiError(404, 'Offer not found or has expired'));
+        }
+
+        const OfferProduct = require('../../models/offer_product.model');
+        const offerProducts = await OfferProduct.find({ offerId: offer._id }).populate({
+            path: 'productId',
             match: { status: 'active' }, // Only populate active products
             populate: [
                 { path: 'categoryId', select: 'name slug image icon' },
@@ -46,9 +53,9 @@ exports.getOfferProducts = async (req, res, next) => {
             ]
         });
 
-        if (!offer) {
-            return next(new ApiError(404, 'Offer not found or has expired'));
-        }
+        const products = offerProducts
+            .filter(op => op.productId !== null)
+            .map(op => op.productId);
 
         // Ideally, we could use a product mapper here. For now, returning populated products directly.
         res.status(200).json(new ApiResponse(200, { 
@@ -60,7 +67,7 @@ exports.getOfferProducts = async (req, res, next) => {
                 discountValue: offer.discountValue,
                 bannerImage: offer.bannerImage
             },
-            products: offer.products 
+            products 
         }, 'Offer products retrieved successfully'));
     } catch (error) {
         next(error);
