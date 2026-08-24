@@ -7,6 +7,19 @@ const addressSchema = new mongoose.Schema(
             ref: 'User',
             required: [true, 'Address must belong to a user'],
         },
+        name: {
+            type: String,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            trim: true,
+        },
+        type: {
+            type: String,
+            enum: ['home', 'work', 'others'],
+            default: 'others',
+        },
         house_number: {
             type: String,
             required: [true, 'Please provide a house number'],
