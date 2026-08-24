@@ -1,6 +1,8 @@
 const Order = require('../../models/order.model');
 const Cart = require('../../models/cart.model');
 const Product = require('../../models/product.model');
+const Payment = require('../../models/payment.model');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { logStockChange } = require('../../utils/stockLogger');
@@ -37,12 +39,45 @@ exports.cancelOrder = async (req, res, next) => {
             return next(new ApiError(404, 'Order not found'));
         }
 
-        if (order.orderStatus !== 'Pending' && order.orderStatus !== 'Confirmed') {
+        if (['Ready For Delivery', 'Delivered'].includes(order.orderStatus)) {
             return next(new ApiError(400, `Cannot cancel order that is already ${order.orderStatus}`));
         }
 
         order.orderStatus = 'Cancelled';
+        order.cancellationReason = req.body.reason || 'Customer requested cancellation';
+        order.cancellationDescription = req.body.description || '';
+        order.cancelledBy = req.user._id;
+        order.cancelledByType = 'USER';
+        order.cancelledAt = new Date();
         await order.save();
+
+        if (order.paymentMethod === 'stripe') {
+            const payment = await Payment.findOne({ orderId: order._id, status: 'Paid' });
+            if (payment && payment.stripePaymentIntentId) {
+                if (!['Refund_Pending', 'Refunded'].includes(payment.status)) {
+                    try {
+                        const refund = await stripe.refunds.create({
+                            payment_intent: payment.stripePaymentIntentId,
+                            reason: 'requested_by_customer'
+                        }, {
+                            idempotencyKey: `refund_full_${order._id.toString()}`
+                        });
+                        
+                        payment.status = 'Refund_Pending';
+                        payment.refundId = refund.id;
+                        payment.refundAmount = payment.amount;
+                        payment.refundReason = 'Customer requested cancellation';
+                        payment.refundStatus = refund.status;
+                        await payment.save();
+                    } catch (stripeError) {
+                        console.error('Stripe refund failed during cancellation:', stripeError);
+                        payment.status = 'Refund_Failed';
+                        payment.failureReason = stripeError.message;
+                        await payment.save();
+                    }
+                }
+            }
+        }
 
         // Optionally, refund stock here depending on business logic
         for (const item of order.items) {

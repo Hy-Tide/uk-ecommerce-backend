@@ -15,6 +15,8 @@ const formatProducts = (products, isLimited = false) => {
                 let stock = v.stockQuantity || 0;
                 totalStock += stock;
                 return {
+                    _id: v._id,
+                    id: v._id || v.id,
                     weight: v.weight,
                     unit: v.weightUnit,
                     displayWeight: v.displayWeight,

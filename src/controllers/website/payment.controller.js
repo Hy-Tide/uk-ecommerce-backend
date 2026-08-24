@@ -248,6 +248,33 @@ exports.webhook = async (req, res, next) => {
                     await failedPayment.save();
                 }
                 break;
+                
+            case 'charge.refund.updated':
+                const refund = event.data.object;
+                const refundedPayment = await Payment.findOne({ stripePaymentIntentId: refund.payment_intent });
+                if (refundedPayment) {
+                    if (refund.status === 'succeeded') {
+                        refundedPayment.status = 'Refunded';
+                        refundedPayment.refundDate = new Date();
+                    } else if (refund.status === 'failed' || refund.status === 'canceled') {
+                        refundedPayment.status = 'Refund_Failed';
+                    }
+                    refundedPayment.refundStatus = refund.status;
+                    await refundedPayment.save();
+                }
+                break;
+                
+            case 'charge.refunded':
+                const charge = event.data.object;
+                const paymentForCharge = await Payment.findOne({ stripePaymentIntentId: charge.payment_intent });
+                if (paymentForCharge) {
+                    if (charge.amount_refunded > 0) {
+                        paymentForCharge.status = 'Refunded';
+                        paymentForCharge.refundDate = new Date();
+                        await paymentForCharge.save();
+                    }
+                }
+                break;
 
             default:
                 console.log(`Unhandled event type ${event.type}`);

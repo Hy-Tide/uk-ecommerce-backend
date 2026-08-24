@@ -26,7 +26,7 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Processing', 'Paid', 'Failed', 'Refunded'],
+        enum: ['Pending', 'Processing', 'Paid', 'Failed', 'Refund_Pending', 'Refunded', 'Refund_Failed'],
         default: 'Pending'
     },
     failureReason: {
@@ -40,6 +40,12 @@ const paymentSchema = new mongoose.Schema({
     },
     refundDate: {
         type: Date
+    },
+    refundReason: {
+        type: String
+    },
+    refundStatus: {
+        type: String
     },
     checkoutData: {
         type: mongoose.Schema.Types.Mixed,

@@ -161,4 +161,64 @@ router.patch('/:id/assign-delivery', orderController.assignDeliveryPerson);
  */
 router.get('/:id/invoice', orderController.printInvoice);
 
+/**
+ * @swagger
+ * /admin/orders/{id}/cancel:
+ *   post:
+ *     summary: Cancel an order and optionally refund
+ *     tags: [Admin Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Order cancelled successfully
+ */
+router.post('/:id/cancel', authMiddleware.requirePermission('orders.manage'), orderController.cancelOrder);
+
+/**
+ * @swagger
+ * /admin/orders/{id}/refund:
+ *   post:
+ *     summary: Issue a full or partial refund for an order
+ *     tags: [Admin Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Refund initiated successfully
+ */
+router.post('/:id/refund', authMiddleware.requirePermission('orders.refund'), orderController.refundOrder);
+
 module.exports = router;

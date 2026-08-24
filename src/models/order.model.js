@@ -37,6 +37,11 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: { type: String, required: true },
     paymentStatus: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
     orderStatus: { type: String, enum: ['Pending', 'Confirmed', 'Preparing', 'Ready For Delivery', 'Delivered', 'Cancelled'], default: 'Pending' },
+    cancellationReason: { type: String },
+    cancellationDescription: { type: String },
+    cancelledBy: { type: mongoose.Schema.Types.ObjectId },
+    cancelledByType: { type: String, enum: ['USER', 'ADMIN'] },
+    cancelledAt: { type: Date },
     deliveryPersonId: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' }, // legacy
     
     activeDeliveryAssignment: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryAssignment' },
