@@ -37,7 +37,7 @@ const formatProducts = (products, isLimited = false) => {
         let formatted = {
             productId: p._id,
             name: p.name || p.title || '',
-            image: (p.images && p.images.length > 0) ? p.images[0] : null,
+            image: (p.images && p.images.length > 0 && typeof p.images[0] === 'string' && !p.images[0].startsWith('data:image')) ? p.images[0] : null,
             price: price,
             originalPrice: originalPrice,
             discount: originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0,
@@ -104,7 +104,11 @@ exports.getHomepage = async (req, res, next) => {
     try {
         const sections = await HomeConfiguration.find({ enabled: true }).sort('displayOrder createdAt');
         const resolvedSectionsPromises = sections.map(section => homeConfigurationService.resolveSectionData(section));
-        const homepageData = await Promise.all(resolvedSectionsPromises);
+        const Setting = require('../../models/setting.model');
+        const [homepageData, setting] = await Promise.all([
+            Promise.all(resolvedSectionsPromises),
+            Setting.findOne()
+        ]);
 
         const responseData = {
             features: [],
@@ -122,8 +126,6 @@ exports.getHomepage = async (req, res, next) => {
             settings: {} // This should ideally be fetched from Setting model, but we will leave empty here as per structure or fetch it
         };
 
-        const Setting = require('../../models/setting.model');
-        let setting = await Setting.findOne();
         if (setting) {
             responseData.settings = {
                 whatsappNumber: setting.whatsappNumber,

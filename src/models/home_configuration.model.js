@@ -98,4 +98,6 @@ const homeConfigurationSchema = new mongoose.Schema({
     }]
 }, { timestamps: true, strict: false });
 
+homeConfigurationSchema.index({ enabled: 1, displayOrder: 1, createdAt: 1 });
+
 module.exports = mongoose.model('HomeConfiguration', homeConfigurationSchema);

@@ -108,4 +108,8 @@ productSchema.pre('validate', function() {
     }
 });
 
+productSchema.index({ status: 1, createdAt: -1 });
+productSchema.index({ status: 1, isFeatured: 1, createdAt: -1 });
+productSchema.index({ status: 1, inStock: 1 });
+
 module.exports = mongoose.model('Product', productSchema);
