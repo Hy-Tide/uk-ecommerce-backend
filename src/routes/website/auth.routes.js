@@ -195,4 +195,18 @@ router.post('/verify-email', authController.verifyEmail);
  */
 router.post('/resend-otp', authController.resendOtp);
 
+/**
+ * @swagger
+ * /website/auth/refresh-token:
+ *   post:
+ *     summary: Refresh session using httpOnly cookie
+ *     tags: [Website Auth]
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *       401:
+ *         description: Refresh token invalid or expired
+ */
+router.post('/refresh-token', authController.refreshToken);
+
 module.exports = router;
