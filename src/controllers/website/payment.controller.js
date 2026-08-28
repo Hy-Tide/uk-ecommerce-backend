@@ -17,6 +17,12 @@ exports.createPaymentIntent = async (req, res, next) => {
             return next(new ApiError(400, 'Shipping address is required before payment'));
         }
 
+        const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'houseNumber', 'street', 'city', 'postcode'];
+        const missingFields = requiredFields.filter(field => !shippingAddress[field] || !shippingAddress[field].toString().trim());
+        if (missingFields.length > 0) {
+            return next(new ApiError(400, `Incomplete shipping address. Missing required fields: ${missingFields.join(', ')}`));
+        }
+
         const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
 
         if (!cart || cart.items.length === 0) {
