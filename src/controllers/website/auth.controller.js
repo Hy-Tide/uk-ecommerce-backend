@@ -45,13 +45,6 @@ exports.register = async (req, res, next) => {
 
         const tokens = AuthService.generateTokens(newUser, 'user');
 
-        res.cookie('refreshToken', tokens.refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
-
         res.status(201).json(new ApiResponse(201, {
             user: {
                 id: newUser._id,
@@ -93,13 +86,6 @@ exports.login = async (req, res, next) => {
 
         const tokens = AuthService.generateTokens(user, 'user');
 
-        res.cookie('refreshToken', tokens.refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
-
         res.status(200).json(new ApiResponse(200, {
             user: {
                 id: user._id,
@@ -117,49 +103,7 @@ exports.login = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
     try {
-        res.cookie('refreshToken', '', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            expires: new Date(0)
-        });
         res.status(200).json(new ApiResponse(200, null, 'Logged out successfully'));
-    } catch (error) {
-        next(error);
-    }
-};
-
-exports.refreshToken = async (req, res, next) => {
-    try {
-        const refreshToken = req.cookies?.refreshToken;
-
-        if (!refreshToken) {
-            return next(new ApiError(401, 'No refresh token provided'));
-        }
-
-        try {
-            const decoded = AuthService.verifyToken(refreshToken, true);
-            
-            const user = await User.findById(decoded.id);
-            if (!user || !user.is_active) {
-                return next(new ApiError(401, 'User no longer exists or is inactive'));
-            }
-
-            const tokens = AuthService.generateTokens(user, 'user');
-
-            res.cookie('refreshToken', tokens.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-            });
-
-            res.status(200).json(new ApiResponse(200, {
-                accessToken: tokens.accessToken
-            }, 'Token refreshed successfully'));
-        } catch (err) {
-            return next(new ApiError(401, 'Invalid or expired refresh token'));
-        }
     } catch (error) {
         next(error);
     }
