@@ -49,6 +49,17 @@ const addressSchema = new mongoose.Schema(
             default: 'UK',
             trim: true,
         },
+        location: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point',
+            },
+            coordinates: {
+                type: [Number], // [longitude, latitude]
+                default: undefined,
+            }
+        },
         is_default: {
             type: Boolean,
             default: false,
