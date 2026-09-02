@@ -108,6 +108,28 @@ router.post('/:id/reorder', orderController.reorder);
 
 /**
  * @swagger
+ * /website/orders/{id}/buy-again:
+ *   post:
+ *     summary: Buy again items from a past order (robust)
+ *     tags: [Website Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Items added to cart for buy again
+ *       404:
+ *         description: Order not found
+ */
+router.post('/:id/buy-again', orderController.buyAgain);
+
+/**
+ * @swagger
  * /website/orders/{id}/invoice:
  *   get:
  *     summary: Get order invoice

@@ -159,6 +159,113 @@ exports.reorder = async (req, res, next) => {
     }
 };
 
+exports.buyAgain = async (req, res, next) => {
+    try {
+        const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
+        if (!order) {
+            return next(new ApiError(404, 'Order not found'));
+        }
+
+        let cart = await Cart.findOne({ user: req.user._id });
+        if (!cart) {
+            cart = new Cart({ user: req.user._id, items: [] });
+        }
+
+        const addedItems = [];
+        const unavailableItems = [];
+
+        for (const item of order.items) {
+            const product = await Product.findById(item.product);
+            if (!product || product.status !== 'active' || !product.inStock) {
+                unavailableItems.push({
+                    productId: item.product,
+                    variantId: item.variationId,
+                    reason: !product ? 'DELETED' : (product.status !== 'active' ? 'INACTIVE' : 'OUT_OF_STOCK')
+                });
+                continue;
+            }
+            
+            const variation = product.variations.id(item.variationId);
+            if (!variation) {
+                unavailableItems.push({
+                    productId: item.product,
+                    variantId: item.variationId,
+                    reason: 'VARIANT_DELETED'
+                });
+                continue;
+            }
+
+            if (variation.stockQuantity <= 0) {
+                unavailableItems.push({
+                    productId: item.product,
+                    variantId: item.variationId,
+                    reason: 'OUT_OF_STOCK'
+                });
+                continue;
+            }
+
+            const availableQty = Math.min(item.quantity, variation.stockQuantity);
+            const currentPrice = variation.salePrice > 0 ? variation.salePrice : variation.regularPrice;
+
+            const existingItemIndex = cart.items.findIndex(cartItem => 
+                cartItem.product.toString() === item.product.toString() && 
+                cartItem.variationId?.toString() === item.variationId.toString()
+            );
+
+            if (existingItemIndex > -1) {
+                const newTotalQty = cart.items[existingItemIndex].quantity + availableQty;
+                const finalQty = Math.min(newTotalQty, variation.stockQuantity);
+                const actuallyAdded = finalQty - cart.items[existingItemIndex].quantity;
+                
+                if (actuallyAdded > 0) {
+                    cart.items[existingItemIndex].quantity = finalQty;
+                    cart.items[existingItemIndex].price = currentPrice;
+                    addedItems.push({
+                        productId: item.product,
+                        variantId: item.variationId,
+                        quantity: actuallyAdded,
+                        availableQuantity: variation.stockQuantity
+                    });
+                } else {
+                    unavailableItems.push({
+                        productId: item.product,
+                        variantId: item.variationId,
+                        reason: 'INSUFFICIENT_STOCK_FOR_CART_COMBINATION'
+                    });
+                }
+            } else {
+                cart.items.push({
+                    product: item.product,
+                    variationId: item.variationId,
+                    quantity: availableQty,
+                    price: currentPrice
+                });
+                addedItems.push({
+                    productId: item.product,
+                    variantId: item.variationId,
+                    quantity: availableQty,
+                    availableQuantity: variation.stockQuantity
+                });
+            }
+        }
+
+        if (addedItems.length > 0) {
+            let subTotal = 0;
+            cart.items.forEach(cartItem => {
+                subTotal += cartItem.price * cartItem.quantity;
+            });
+            cart.subTotal = subTotal;
+            cart.totalAmount = Math.max(0, cart.subTotal - (cart.discountAmount || 0));
+            
+            await cart.save();
+        }
+        
+        res.status(200).json(new ApiResponse(200, { addedItems, unavailableItems }, 'Buy Again processed'));
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getInvoice = async (req, res, next) => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user._id })
