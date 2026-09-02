@@ -5,6 +5,7 @@ const Order = require('../../models/order.model');
 const ApiError = require('../../utils/ApiError');
 const ApiResponse = require('../../utils/ApiResponse');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // Helper to check and update partner availability
 const updatePartnerAvailability = async (partnerId) => {
@@ -36,7 +37,14 @@ exports.assignOrder = async (req, res, next) => {
         const { orderId, deliveryPartnerId, notes } = req.body;
         const adminId = req.user._id;
 
-        const order = await Order.findById(orderId);
+        let queryOrderId = orderId;
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            const orderObj = await Order.findOne({ orderNumber: orderId });
+            if (!orderObj) return next(new ApiError(404, 'Order not found'));
+            queryOrderId = orderObj._id;
+        }
+
+        const order = await Order.findById(queryOrderId);
         if (!order) return next(new ApiError(404, 'Order not found'));
         if (['Delivered', 'Cancelled'].includes(order.orderStatus)) {
             return next(new ApiError(400, `Cannot assign delivery for ${order.orderStatus} order`));
@@ -51,7 +59,7 @@ exports.assignOrder = async (req, res, next) => {
 
         // Create Assignment
         const assignment = await DeliveryAssignment.create({
-            orderId,
+            orderId: queryOrderId,
             deliveryPartnerId,
             assignedBy: adminId,
             deliveryNotes: notes,
@@ -91,7 +99,14 @@ exports.reassignOrder = async (req, res, next) => {
         const { orderId, deliveryPartnerId, notes } = req.body;
         const adminId = req.user._id;
 
-        const order = await Order.findById(orderId);
+        let queryOrderId = orderId;
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            const orderObj = await Order.findOne({ orderNumber: orderId });
+            if (!orderObj) return next(new ApiError(404, 'Order not found'));
+            queryOrderId = orderObj._id;
+        }
+
+        const order = await Order.findById(queryOrderId);
         if (!order) return next(new ApiError(404, 'Order not found'));
 
         const newPartner = await DeliveryPartner.findById(deliveryPartnerId);
@@ -123,11 +138,11 @@ exports.reassignOrder = async (req, res, next) => {
 
         // Create new assignment
         const newAssignment = await DeliveryAssignment.create({
-            orderId,
+            orderId: queryOrderId,
             deliveryPartnerId,
             assignedBy: adminId,
             deliveryNotes: notes,
-            deliveryStatus: 'ASSIGNED'
+            deliveryStatus: 'REASSIGNED'
         });
 
         // Update Order
@@ -212,7 +227,17 @@ exports.updateDeliveryStatus = async (req, res, next) => {
 exports.getAssignmentHistory = async (req, res, next) => {
     try {
         const { orderId } = req.params;
-        const history = await DeliveryHistory.find({ orderId })
+        let queryOrderId = orderId;
+
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            const order = await Order.findOne({ orderNumber: orderId });
+            if (!order) {
+                return res.status(404).json(new ApiResponse(404, null, 'Order not found'));
+            }
+            queryOrderId = order._id;
+        }
+
+        const history = await DeliveryHistory.find({ orderId: queryOrderId })
             .populate('deliveryPartnerId', 'name phone')
             .populate('performedBy', 'name email')
             .sort({ timestamp: -1 });
