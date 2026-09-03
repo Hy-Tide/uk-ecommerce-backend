@@ -174,11 +174,29 @@ exports.updateDeliveryStatus = async (req, res, next) => {
             return next(new ApiError(400, 'Validation Error', errors.array()));
         }
 
-        const { id } = req.params; // assignment ID
+        const { id } = req.params; // assignment ID or order ID
         const { status, notes } = req.body;
         const adminId = req.user._id;
 
-        const assignment = await DeliveryAssignment.findById(id);
+        let assignment = null;
+        
+        // 1. Try treating it as an Assignment ID (ObjectId)
+        if (mongoose.Types.ObjectId.isValid(id)) {
+            assignment = await DeliveryAssignment.findById(id);
+        }
+        
+        // 2. If not found, try treating it as an Order ID
+        if (!assignment) {
+            let orderQueryId = id;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                const orderObj = await Order.findOne({ orderNumber: id });
+                if (orderObj) orderQueryId = orderObj._id;
+            }
+            if (mongoose.Types.ObjectId.isValid(orderQueryId)) {
+                assignment = await DeliveryAssignment.findOne({ orderId: orderQueryId, isCurrent: true });
+            }
+        }
+
         if (!assignment) return next(new ApiError(404, 'Delivery assignment not found'));
         if (!assignment.isCurrent) return next(new ApiError(400, 'Cannot update a past assignment'));
 
@@ -202,9 +220,11 @@ exports.updateDeliveryStatus = async (req, res, next) => {
         const order = await Order.findById(assignment.orderId);
         if (order) {
             order.deliveryStatus = status;
-            // Optionally update overall orderStatus based on delivery
+            // Update overall orderStatus based on delivery to sync with Orders module
             if (status === 'DELIVERED') order.orderStatus = 'Delivered';
             if (status === 'OUT_FOR_DELIVERY') order.orderStatus = 'Ready For Delivery';
+            if (status === 'PICKED_UP') order.orderStatus = 'Ready For Delivery';
+            if (status === 'ACCEPTED') order.orderStatus = 'Ready For Delivery';
             await order.save();
         }
 

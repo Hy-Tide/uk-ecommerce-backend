@@ -22,7 +22,8 @@ exports.getSettings = async (req, res, next) => {
             minimumOrderAmount: setting.minimumOrderAmount,
             freeDeliveryAmount: setting.freeDeliveryAmount,
             logoUrl: setting.logoUrl,
-            faviconUrl: setting.faviconUrl
+            faviconUrl: setting.faviconUrl,
+            announcement: setting.announcement
         };
 
         res.status(200).json(new ApiResponse(200, data, 'Settings retrieved successfully'));

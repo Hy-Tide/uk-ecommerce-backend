@@ -28,7 +28,13 @@ const settingSchema = new mongoose.Schema({
     },
     googlePayMerchantId: { type: String, default: '' },
     logoUrl: { type: String, default: '' },
-    faviconUrl: { type: String, default: '' }
+    faviconUrl: { type: String, default: '' },
+    announcement: {
+        freeDeliveryText: { type: String, default: '' },
+        offerText: { type: String, default: '' },
+        timingText: { type: String, default: '' },
+        whatsappText: { type: String, default: '' }
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Setting', settingSchema);

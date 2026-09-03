@@ -30,7 +30,7 @@ exports.updateSettings = async (req, res, next) => {
                 'whatsappNumber', 'socialMedia', 'currency', 'taxPercentage', 
                 'deliveryCharge', 'minimumOrderAmount', 'freeDeliveryAmount', 
                 'stripeKeys', 'paypalKeys', 'googlePayMerchantId', 
-                'logoUrl', 'faviconUrl'
+                'logoUrl', 'faviconUrl', 'announcement'
             ];
             
             updatableFields.forEach(field => {
