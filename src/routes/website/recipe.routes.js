@@ -44,6 +44,30 @@ router.get('/', recipeController.getRecipes);
 
 /**
  * @swagger
+ * /website/recipes/seasonal:
+ *   get:
+ *     summary: Get seasonal recipe collections
+ *     tags: [Website Recipes]
+ *     responses:
+ *       200:
+ *         description: Seasonal collections retrieved successfully
+ */
+router.get('/seasonal', recipeController.getSeasonalRecipes);
+
+/**
+ * @swagger
+ * /website/recipes/cuisines:
+ *   get:
+ *     summary: Get all recipe cuisines
+ *     tags: [Website Recipes]
+ *     responses:
+ *       200:
+ *         description: Cuisines retrieved successfully
+ */
+router.get('/cuisines', recipeController.getRecipeCuisines);
+
+/**
+ * @swagger
  * /website/recipes/{id}:
  *   get:
  *     summary: Get recipe details by ID
