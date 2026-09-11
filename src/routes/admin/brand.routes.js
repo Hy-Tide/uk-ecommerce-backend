@@ -72,7 +72,7 @@ const upload = require('../../config/upload');
  *         description: Brands retrieved successfully
  */
 router.route('/')
-    .post(authMiddleware.protectAdmin, upload.single('image_url'), brandValidator, brandController.createBrand)
+    .post(authMiddleware.protectAdmin, upload.single('image'), brandValidator, brandController.createBrand)
     .get(brandController.getAllBrands);
 
 /**
@@ -143,7 +143,7 @@ router.route('/')
  */
 router.route('/:id')
     .get(brandController.getBrandById)
-    .put(authMiddleware.protectAdmin, upload.single('image_url'), brandValidator, brandController.updateBrand)
+    .put(authMiddleware.protectAdmin, upload.single('image'), brandValidator, brandController.updateBrand)
     .delete(authMiddleware.protectAdmin, brandController.deleteBrand);
 
 module.exports = router;
