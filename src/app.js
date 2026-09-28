@@ -21,24 +21,9 @@ const app = express();
 app.use(helmet());
 
 // Cross-Origin Resource Sharing
-const allowedOrigins = [
-    'https://uk-ecommerce-admin.hytide.in',
-    'https://uk-ecommerce.hytide.in',
-    'https://grandmasbasket.co.uk',
-    'https://www.grandmasbasket.co.uk',
-    process.env.CLIENT_URL,
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:5173'
-].filter(Boolean);
-
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+        callback(null, true); // Allow all origins
     },
     credentials: true
 }));
